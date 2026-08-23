@@ -4,10 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.officina.officina_be.core.templates.BaseEntity;
+import com.officina.officina_be.core.utils.Constants.BookingStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,8 +39,9 @@ public class Booking extends BaseEntity {
     @Column(name = "booking_id", nullable = false, unique = true)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status; //Da rivedere il tipo.
+    private BookingStatus status = BookingStatus.PENDING;
 
     @Column(name = "notes", nullable = true)
     private String notes;
