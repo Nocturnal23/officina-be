@@ -23,5 +23,5 @@ public abstract class BaseEntity implements IdentifiableEntity  {
     protected LocalDateTime modifiedDate;
 
     @Column(name = "deleted", nullable = false)
-    protected Long deleted;
+    protected boolean deleted = false;
 }
