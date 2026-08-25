@@ -13,10 +13,4 @@ public class Constants {
         COMPLETED,
         CANCELLED
     };
-
-    //TODO Usare questo enum per i lavori offerti dall'officina.
-    public enum Services {
-        ALTRO,
-        TAGLIANDO,
-    }
 }
