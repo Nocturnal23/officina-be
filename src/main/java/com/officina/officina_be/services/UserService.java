@@ -1,5 +1,6 @@
 package com.officina.officina_be.services;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
     private final UserRepository userRepo;
     private final UserMapper userMapper;
+    private final PasswordEncoder pswEncoder;
 
     @Transactional
     public UserResponse registerUser(UserRequest request) {
@@ -30,6 +32,7 @@ public class UserService {
 
         User user = userMapper.toEntity(request);
         user.setRole(Constants.Role.USER);
+        user.setPassword(pswEncoder.encode(request.password()));
         User savedUser = userRepo.save(user);
 
         return userMapper.toResponse(savedUser);
@@ -39,7 +42,7 @@ public class UserService {
     public UserResponse loginUser(LoginRequest request) {
         User user = userRepo.findByEmailIgnoreCase(request.email()).orElseThrow(() -> new Unauthorized("Credenziali errate"));
 
-        if (!user.getPassword().equals(request.password())) {
+        if (!pswEncoder.matches(request.password(), user.getPassword())) {
             throw new Unauthorized("Credenziali non valide");
         }
 
