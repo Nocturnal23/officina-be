@@ -1,8 +1,11 @@
 package com.officina.officina_be.controller;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,6 +43,15 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         UserResponse response = userService.getUserByID(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(
+        @PathVariable Long id, 
+        @RequestBody Map<String, Object> updates
+    ) {
+        UserResponse response = userService.updateUser(id, updates);
         return ResponseEntity.ok(response);
     }
 }
