@@ -1,5 +1,7 @@
 package com.officina.officina_be.services;
 
+import java.util.Map;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,4 +57,23 @@ public class UserService {
 
         return userMapper.toResponse(user);
     }
+
+    @Transactional
+public UserResponse updateUser(Long id, Map<String, Object> updates) {
+    User user = userRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFound("Utente " + id + " non trovato"));
+
+    if (updates.containsKey("firstName")) {
+        user.setFirstName((String) updates.get("firstName"));
+    }
+    if (updates.containsKey("lastName")) {
+        user.setLastName((String) updates.get("lastName"));
+    }
+    if (updates.containsKey("phoneNumber")) {
+        user.setPhoneNumber((String) updates.get("phoneNumber"));
+    }
+
+    User savedUser = userRepo.save(user);
+    return userMapper.toResponse(savedUser);
+}
 }
