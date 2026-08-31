@@ -103,8 +103,11 @@ public class SecurityConfiguration {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             //Permette le chiamate publiche verso gli endpoint.
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/users/**").permitAll()
-                .requestMatchers("/vehicles/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/users/me/vehicles").permitAll()
+                .requestMatchers("/api/users/me/**").authenticated()
+                .requestMatchers("/api/users/**").authenticated()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
             );
