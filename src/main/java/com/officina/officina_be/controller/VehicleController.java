@@ -22,25 +22,24 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users/{userId}/vehicles")
+@RequestMapping("/api/users/me/vehicles")
 public class VehicleController {
     private final VehicleService vehicleService;
 
     //Salva un veicolo. Da usare per clienti e admin.
     @PostMapping
-    // @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<VehicleResponse> addVehicle(
-        @PathVariable Long userId,
         @Valid @RequestBody VehicleRequest request
     ) {
-        VehicleResponse response = vehicleService.saveVehicle(request, userId);
+        // TODO: sostituire con Principal/Authentication una volta introdotto JWT.
+        VehicleResponse response = vehicleService.saveVehicle(request, 1L);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
-    public ResponseEntity<List<VehicleResponse>> getVehiclesByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(vehicleService.getVehiclesByUserId(userId));
+    public ResponseEntity<List<VehicleResponse>> getVehiclesByUser() {
+        // TODO: sostituire con Principal/Authentication una volta introdotto JWT.
+        return ResponseEntity.ok(vehicleService.getVehiclesByUserId(1L));
     }
 
     @DeleteMapping("/{vehicleId}")

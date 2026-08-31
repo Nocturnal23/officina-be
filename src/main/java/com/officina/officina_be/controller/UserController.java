@@ -22,31 +22,44 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/api")
 public class UserController {
     private final UserService userService;
     
     //Registra utente.
-    @PostMapping("/register")
+    @PostMapping("/auth/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRequest request) {
         UserResponse response = userService.registerUser(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest request) {
         UserResponse response = userService.loginUser(request);
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/users/me")
+    public ResponseEntity<UserResponse> getCurrentUser() {
+        // TODO: sostituire con Principal/Authentication una volta introdotto JWT.
+        return ResponseEntity.ok(userService.getUserByID(1L));
+    }
+
+    @PatchMapping("/users/me")
+    public ResponseEntity<UserResponse> updateCurrentUser(@RequestBody Map<String, Object> updates) {
+        // TODO: sostituire con Principal/Authentication una volta introdotto JWT.
+        UserResponse response = userService.updateUser(1L, updates);
+        return ResponseEntity.ok(response);
+    }
+
     //Recuperare le info di un utente tramite ID.
-    @GetMapping("/{id}")
+    @GetMapping("/users/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         UserResponse response = userService.getUserByID(id);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/users/{id}")
     public ResponseEntity<UserResponse> updateUser(
         @PathVariable Long id, 
         @RequestBody Map<String, Object> updates
