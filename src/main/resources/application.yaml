@@ -1,21 +1,26 @@
 server:
-  port: 8080
+    port: 8080
 
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/officina_db
-    username: postgres
-    password: password
-    driver-class-name: org.postgresql.Driver
+    datasource:
+        url: jdbc:postgresql://localhost:5432/officina_db
+        username: postgres
+        password: password
+        driver-class-name: org.postgresql.Driver
 
-  application:
-    name: officina-be
+    application:
+        name: officina-be
 
-  jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
-      properties:
+    jpa:
         hibernate:
-          format_sql: true
-      open-in-view: false
+            ddl-auto: update
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+        open-in-view: false
+
+    security:
+        jwt:
+            secret: jw3eMKhpU7SjPFexr62OZJt3rI/bVJI3CTXCfDltws0=
+            expiration-ms: 28800000
