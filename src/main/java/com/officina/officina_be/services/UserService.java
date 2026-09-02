@@ -6,9 +6,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.officina.officina_be.config.JwtService;
 import com.officina.officina_be.core.utils.Constants;
 import com.officina.officina_be.dto.request.LoginRequest;
 import com.officina.officina_be.dto.request.UserRequest;
+import com.officina.officina_be.dto.response.LoginResponse;
 import com.officina.officina_be.dto.response.UserResponse;
 import com.officina.officina_be.entity.User;
 import com.officina.officina_be.error.DuplicateResource;
@@ -25,6 +27,7 @@ public class UserService {
     private final UserRepository userRepo;
     private final UserMapper userMapper;
     private final PasswordEncoder pswEncoder;
+    private final JwtService jwtService;
 
     @Transactional
     public UserResponse registerUser(UserRequest request) {
@@ -41,14 +44,17 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse loginUser(LoginRequest request) {
+    public LoginResponse loginUser(LoginRequest request) {
         User user = userRepo.findByEmailIgnoreCase(request.email()).orElseThrow(() -> new Unauthorized("Credenziali errate"));
 
         if (!pswEncoder.matches(request.password(), user.getPassword())) {
             throw new Unauthorized("Credenziali non valide");
         }
 
-        return userMapper.toResponse(user);
+        String token = jwtService.generateToken(user);
+        UserResponse userResponse = userMapper.toResponse(user);
+
+        return new LoginResponse(token, userResponse);
     }
 
     @Transactional(readOnly = true)
@@ -59,21 +65,27 @@ public class UserService {
     }
 
     @Transactional
-public UserResponse updateUser(Long id, Map<String, Object> updates) {
-    User user = userRepo.findById(id)
-        .orElseThrow(() -> new ResourceNotFound("Utente " + id + " non trovato"));
+    public UserResponse updateUser(Long id, Map<String, Object> updates) {
+        User user = userRepo.findById(id)
+            .orElseThrow(() -> new ResourceNotFound("Utente " + id + " non trovato"));
 
-    if (updates.containsKey("firstName")) {
-        user.setFirstName((String) updates.get("firstName"));
-    }
-    if (updates.containsKey("lastName")) {
-        user.setLastName((String) updates.get("lastName"));
-    }
-    if (updates.containsKey("phoneNumber")) {
-        user.setPhoneNumber((String) updates.get("phoneNumber"));
+        if (updates.containsKey("firstName")) {
+            user.setFirstName((String) updates.get("firstName"));
+        }
+        if (updates.containsKey("lastName")) {
+            user.setLastName((String) updates.get("lastName"));
+        }
+        if (updates.containsKey("phoneNumber")) {
+            user.setPhoneNumber((String) updates.get("phoneNumber"));
+        }
+
+        User savedUser = userRepo.save(user);
+        return userMapper.toResponse(savedUser);
     }
 
-    User savedUser = userRepo.save(user);
-    return userMapper.toResponse(savedUser);
-}
+    @Transactional
+    public User findByEmail(String email) {
+        return userRepo.findByEmailIgnoreCase(email)
+            .orElseThrow(() -> new ResourceNotFound("Utente non trovato"));
+    }
 }
