@@ -52,8 +52,9 @@ public class VehicleService {
     }
 
     @Transactional
-    public void deleteVehicle(Long vehicleId) {
-        Vehicle vehicle = vehicleRepo.findById(vehicleId).orElseThrow(() -> new ResourceNotFound("Veicolo con ID " + vehicleId + " non trovato."));
+    public void deleteVehicle(Long vehicleId, Long userId) {
+        Vehicle vehicle = vehicleRepo.findByIdAndUser_IdAndDeletedFalse(vehicleId, userId)
+            .orElseThrow(() -> new ResourceNotFound("Veicolo con ID " + vehicleId + " non trovato."));
 
         vehicle.setDeleted(true);
         vehicleRepo.save(vehicle);
