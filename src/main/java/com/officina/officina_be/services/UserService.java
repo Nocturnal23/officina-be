@@ -45,7 +45,7 @@ public class UserService {
 
     @Transactional
     public LoginResponse loginUser(LoginRequest request) {
-        User user = userRepo.findByEmailIgnoreCase(request.email()).orElseThrow(() -> new Unauthorized("Credenziali errate"));
+        User user = userRepo.findByEmailIgnoreCaseAndDeletedFalse(request.email()).orElseThrow(() -> new Unauthorized("Credenziali errate"));
 
         if (!pswEncoder.matches(request.password(), user.getPassword())) {
             throw new Unauthorized("Credenziali non valide");
@@ -59,14 +59,14 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponse getUserByID(Long id) {
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFound("Utente " + id + " non trovato"));
+        User user = userRepo.findByIdAndDeletedFalse(id).orElseThrow(() -> new ResourceNotFound("Utente " + id + " non trovato"));
 
         return userMapper.toResponse(user);
     }
 
     @Transactional
     public UserResponse updateUser(Long id, Map<String, Object> updates) {
-        User user = userRepo.findById(id)
+        User user = userRepo.findByIdAndDeletedFalse(id)
             .orElseThrow(() -> new ResourceNotFound("Utente " + id + " non trovato"));
 
         if (updates.containsKey("firstName")) {
@@ -85,7 +85,16 @@ public class UserService {
 
     @Transactional
     public User findByEmail(String email) {
-        return userRepo.findByEmailIgnoreCase(email)
+        return userRepo.findByEmailIgnoreCaseAndDeletedFalse(email)
             .orElseThrow(() -> new ResourceNotFound("Utente non trovato"));
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepo.findByIdAndDeletedFalse(userId)
+            .orElseThrow(() -> new ResourceNotFound("Utente non trovato") );
+            
+        user.setDeleted(true);
+        userRepo.save(user);
     }
 }

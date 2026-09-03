@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -67,5 +68,12 @@ public class UserController {
     ) {
         UserResponse response = userService.updateUser(id, updates);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/users/me")
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal User user) {
+        userService.deleteUser(user.getId());
+
+        return ResponseEntity.noContent().build();
     }
 }
