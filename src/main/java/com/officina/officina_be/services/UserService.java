@@ -1,5 +1,6 @@
 package com.officina.officina_be.services;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,11 +14,13 @@ import com.officina.officina_be.dto.request.UserRequest;
 import com.officina.officina_be.dto.response.LoginResponse;
 import com.officina.officina_be.dto.response.UserResponse;
 import com.officina.officina_be.entity.User;
+import com.officina.officina_be.entity.Vehicle;
 import com.officina.officina_be.error.DuplicateResource;
 import com.officina.officina_be.error.ResourceNotFound;
 import com.officina.officina_be.error.Unauthorized;
 import com.officina.officina_be.mapper.UserMapper;
 import com.officina.officina_be.repository.UserRepository;
+import com.officina.officina_be.repository.VehicleRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +31,8 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder pswEncoder;
     private final JwtService jwtService;
+    private final VehicleRepository vehicleRepo;
+    private final VehicleService vehicleService;
 
     @Transactional
     public UserResponse registerUser(UserRequest request) {
@@ -93,6 +98,12 @@ public class UserService {
     public void deleteUser(Long userId) {
         User user = userRepo.findByIdAndDeletedFalse(userId)
             .orElseThrow(() -> new ResourceNotFound("Utente non trovato") );
+
+        List<Vehicle> vehicles = vehicleRepo.findByUser_IdAndDeletedFalse(userId);
+
+        for(Vehicle veh: vehicles) {
+            vehicleService.deleteVehicle(veh.getId(), userId);
+        }
             
         user.setDeleted(true);
         userRepo.save(user);

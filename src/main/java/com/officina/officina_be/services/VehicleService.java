@@ -26,7 +26,7 @@ public class VehicleService {
      
     @Transactional
     public VehicleResponse saveVehicle(VehicleRequest request, Long userId) {
-        if(vehicleRepo.existsByPlateIgnoreCase(request.plate())) {
+        if(vehicleRepo.existsByPlateIgnoreCaseAndDeletedFalse(request.plate())) {
             throw new DuplicateResource("Attenzione, la targa inserita è già associata a un altro veicolo");
         }
 

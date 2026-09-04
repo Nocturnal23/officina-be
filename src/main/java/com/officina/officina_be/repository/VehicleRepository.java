@@ -19,5 +19,7 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     //Evita duplicati sulla targa.
     boolean existsByPlateIgnoreCase(String plate);
 
+    boolean existsByPlateIgnoreCaseAndDeletedFalse(String plate);
+
     Optional<Vehicle> findByIdAndUser_IdAndDeletedFalse(Long vehicleId, Long userId);
 }
