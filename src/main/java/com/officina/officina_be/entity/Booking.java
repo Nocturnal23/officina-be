@@ -50,11 +50,15 @@ public class Booking extends BaseEntity {
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "booking_services",
         joinColumns = @JoinColumn(name = "booking_id"),
         inverseJoinColumns = @JoinColumn(name = "service_id")
     )
-    private Set<Service> services = new HashSet<>();
+    private Set<Jobs> jobs = new HashSet<>();
 }
