@@ -65,5 +65,5 @@ public class InterventionHistory extends BaseEntity {
         joinColumns = @JoinColumn(name = "loco_id"),
         inverseJoinColumns = @JoinColumn(name = "service_id")
     )
-    private Set<Service> services = new HashSet<>();
+    private Set<Jobs> jobs = new HashSet<>();
 }
