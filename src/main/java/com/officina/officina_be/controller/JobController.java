@@ -18,7 +18,7 @@ import com.officina.officina_be.dto.response.JobResponse;
 import com.officina.officina_be.entity.Jobs;
 import com.officina.officina_be.services.JobService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
