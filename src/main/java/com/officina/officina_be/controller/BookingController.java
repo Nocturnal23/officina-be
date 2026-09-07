@@ -17,7 +17,7 @@ import com.officina.officina_be.dto.response.BookingResponse;
 import com.officina.officina_be.entity.User;
 import com.officina.officina_be.services.BookingService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
