@@ -50,7 +50,7 @@ public class JobController {
 
     @PostMapping("/admin/jobs/{jobId}")
     public ResponseEntity<JobResponse> updateJob(
-        @AuthenticationPrincipal Jobs job,
+        @PathVariable Jobs job,
         @RequestBody Map<String, Object> updates
     ) {
         JobResponse response = jobService.updateJob(job.getId(), updates);
@@ -58,7 +58,7 @@ public class JobController {
     }
 
     @DeleteMapping("/admin/jobs/{jobId}")
-    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal Jobs job) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Jobs job) {
         jobService.deleteJob(job.getId());
 
         return ResponseEntity.noContent().build();
