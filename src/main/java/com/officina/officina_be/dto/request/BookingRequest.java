@@ -1,5 +1,6 @@
 package com.officina.officina_be.dto.request;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 import jakarta.validation.constraints.NotNull;
@@ -10,5 +11,8 @@ public record BookingRequest(
     String notes, //Potrebbero essere vuote
     
     @NotNull
-    Set<Long> jobsIds
+    Set<Long> jobsIds,
+
+    @NotNull 
+    LocalDate appointmentDate
 ) {}

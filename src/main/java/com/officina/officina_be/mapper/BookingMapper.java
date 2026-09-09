@@ -15,6 +15,7 @@ public class BookingMapper {
     public Booking toEntity(BookingRequest request) {
         Booking booking = new Booking();
         booking.setNotes(request.notes());
+        booking.setAppointmentDate(request.appointmentDate());
         return booking;
     }
 
@@ -30,7 +31,8 @@ public class BookingMapper {
             entity.getNotes(),
             entity.getVehicle().getId(),
             entity.getUser().getId(),
-            jobsIds
+            jobsIds,
+            entity.getAppointmentDate()
         );
     }
 }
