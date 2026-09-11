@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.officina.officina_be.dto.request.JobAvailabilityRequest;
 import com.officina.officina_be.dto.request.JobRequest;
 import com.officina.officina_be.dto.response.JobResponse;
 import com.officina.officina_be.entity.Jobs;
@@ -36,7 +37,7 @@ public class JobService {
 
     @Transactional
     public void deleteJob(Long jobId) {
-        Jobs job = jobsRepo.findByIdAndDeletedFalse(jobId)
+        Jobs job = jobsRepo.findById(jobId)
             .orElseThrow(() -> new ResourceNotFound("Servizio non trovato."));
 
         job.setDeleted(true);
@@ -45,7 +46,7 @@ public class JobService {
 
     @Transactional 
     public JobResponse updateJob(Long jobId, Map<String, Object> updates){
-        Jobs job = jobsRepo.findByIdAndDeletedFalse(jobId)
+        Jobs job = jobsRepo.findById(jobId)
             .orElseThrow(() -> new ResourceNotFound("Lavoro non trovato."));
 
         if(updates.containsKey("type")) {
@@ -69,9 +70,29 @@ public class JobService {
 
     @Transactional(readOnly = true)
     public JobResponse getJobById(Long jobId) {
-        Jobs job = jobsRepo.findByIdAndDeletedFalse(jobId)
+        Jobs job = jobsRepo.findById(jobId)
             .orElseThrow(() -> new ResourceNotFound("Lavoro non trovato."));
 
         return jobMapper.toResponse(job);
+    }
+
+    @Transactional 
+    public List<JobResponse> getAllJobsForAdmin() {
+        return jobsRepo.findAll()
+            .stream()
+            .map(jobMapper::toResponse)
+            .toList();
+    }
+
+    @Transactional
+    public JobResponse updateAvailability(Long jobId, JobAvailabilityRequest request) {
+        Jobs job = jobsRepo.findById(jobId)
+            .orElseThrow(() ->
+                new ResourceNotFound("Lavoro non trovato.")
+            );
+
+        job.setDeleted(request.deleted());
+
+        return jobMapper.toResponse(jobsRepo.save(job));
     }
 }

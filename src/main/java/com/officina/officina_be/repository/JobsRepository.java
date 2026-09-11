@@ -11,13 +11,15 @@ import com.officina.officina_be.entity.Jobs;
 
 @Repository
 public interface JobsRepository extends JpaRepository<Jobs, Long> {
-    Optional<Jobs> findByIdAndDeletedFalse(Long jobId);
+    Optional<Jobs> findById(Long jobId);
 
     Optional<Jobs> findByTypeAndDeletedFalse(String type);
 
     List<Jobs> findByIdInAndDeletedFalse(Collection<Long> ids);
 
     List<Jobs> findAllByDeletedFalse();
+
+    List<Jobs> findAll();
 
     boolean existsByTypeIgnoreCaseAndDeletedFalse(String type);
 }

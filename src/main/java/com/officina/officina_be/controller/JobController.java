@@ -5,17 +5,17 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.officina.officina_be.dto.request.JobAvailabilityRequest;
 import com.officina.officina_be.dto.request.JobRequest;
 import com.officina.officina_be.dto.response.JobResponse;
-import com.officina.officina_be.entity.Jobs;
 import com.officina.officina_be.services.JobService;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,11 +27,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api")
 public class JobController {
     private final JobService jobService;
-
-    @GetMapping("/jobs")
-    public ResponseEntity<List<JobResponse>> getAllJobs() {
-        return ResponseEntity.ok(jobService.getAllJobs());
-    }
 
     @GetMapping("/jobs/{jobId}")
     public ResponseEntity<JobResponse> getJobById(
@@ -50,17 +45,34 @@ public class JobController {
 
     @PostMapping("/admin/jobs/{jobId}")
     public ResponseEntity<JobResponse> updateJob(
-        @PathVariable Jobs job,
+        @PathVariable Long jobId,
         @RequestBody Map<String, Object> updates
     ) {
-        JobResponse response = jobService.updateJob(job.getId(), updates);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+            jobService.updateJob(jobId, updates)
+        );
     }
 
     @DeleteMapping("/admin/jobs/{jobId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Jobs job) {
-        jobService.deleteJob(job.getId());
-
+    public ResponseEntity<Void> deleteJob(@PathVariable Long jobId) {
+        jobService.deleteJob(jobId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/jobs")
+    public ResponseEntity<List<JobResponse>> getAvailableJobs() {
+        return ResponseEntity.ok(jobService.getAllJobs());
+    }
+
+    @GetMapping("/admin/jobs")
+    public ResponseEntity<List<JobResponse>> getAdminJobs() {
+        return ResponseEntity.ok(jobService.getAllJobsForAdmin());
+    }
+
+    @PatchMapping("/admin/jobs/{jobId}/availability")
+    public ResponseEntity<JobResponse> updateAvailability(@PathVariable Long jobId, @RequestBody JobAvailabilityRequest request) {
+        return ResponseEntity.ok(
+            jobService.updateAvailability(jobId, request)
+        );
     }
 }

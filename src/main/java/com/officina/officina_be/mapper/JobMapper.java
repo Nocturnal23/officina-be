@@ -19,7 +19,8 @@ public class JobMapper {
         return new JobResponse(
             entity.getId(),
             entity.getType(),
-            entity.getDescription()
+            entity.getDescription(),
+            entity.isDeleted()
         );
     }
 }
