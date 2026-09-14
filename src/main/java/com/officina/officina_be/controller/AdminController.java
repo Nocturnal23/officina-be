@@ -36,7 +36,7 @@ public class AdminController {
         return ResponseEntity.ok(vehicleService.getVehicleById(vehicleId));
     }
 
-    @PostMapping("/admin/jobs")
+    @PostMapping("/jobs")
     public ResponseEntity<JobResponse> registerJob(
         @Valid @RequestBody JobRequest request
     ) {
@@ -44,7 +44,7 @@ public class AdminController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("/admin/jobs/{jobId}")
+    @PostMapping("/jobs/{jobId}")
     public ResponseEntity<JobResponse> updateJob(
         @PathVariable Long jobId,
         @RequestBody Map<String, Object> updates
@@ -54,18 +54,18 @@ public class AdminController {
         );
     }
 
-    @DeleteMapping("/admin/jobs/{jobId}")
+    @DeleteMapping("/jobs/{jobId}")
     public ResponseEntity<Void> deleteJob(@PathVariable Long jobId) {
         jobService.deleteJob(jobId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/admin/jobs")
+    @GetMapping("/jobs")
     public ResponseEntity<List<JobResponse>> getAdminJobs() {
         return ResponseEntity.ok(jobService.getAllJobsForAdmin());
     }
 
-    @PatchMapping("/admin/jobs/{jobId}/availability")
+    @PatchMapping("/jobs/{jobId}/availability")
     public ResponseEntity<JobResponse> updateAvailability(@PathVariable Long jobId, @RequestBody JobAvailabilityRequest request) {
         return ResponseEntity.ok(
             jobService.updateAvailability(jobId, request)
