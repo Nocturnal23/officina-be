@@ -47,4 +47,9 @@ public class VehicleController {
         vehicleService.deleteVehicle(vehicleId, user.getId());
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{vehicleId}")
+    public ResponseEntity<VehicleResponse> getVehicleById(@PathVariable Long vehicleId) {
+        return ResponseEntity.ok(vehicleService.getVehicleById(vehicleId));
+    }
 }
