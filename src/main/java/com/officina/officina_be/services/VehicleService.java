@@ -59,4 +59,11 @@ public class VehicleService {
         vehicle.setDeleted(true);
         vehicleRepo.save(vehicle);
     }
+
+    @Transactional
+    public VehicleResponse getVehicleById(Long vehicleId) {
+        Vehicle vehicle = vehicleRepo.findByIdAndDeletedFalse(vehicleId)
+            .orElseThrow(() -> new ResourceNotFound("Veicolo con ID " + vehicleId + " non trovato."));
+        return vehicleMapper.toResponse(vehicle);
+    }
 }
