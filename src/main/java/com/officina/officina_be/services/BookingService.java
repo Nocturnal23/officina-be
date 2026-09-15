@@ -7,6 +7,7 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.officina.officina_be.core.utils.Constants.BookingStatus;
 import com.officina.officina_be.dto.request.BookingRequest;
 import com.officina.officina_be.dto.response.BookingResponse;
 import com.officina.officina_be.entity.Booking;
@@ -81,6 +82,34 @@ public class BookingService {
     @Transactional
     public void deleteBooking(Long bookingId, Long userId) {
         Booking booking = bookingRepo.findByIdAndUser_IdAndDeletedFalse(bookingId, userId)
+            .orElseThrow(() -> new ResourceNotFound("Prenotazione non trovata."));
+
+        booking.setDeleted(true);
+        bookingRepo.save(booking);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookingResponse> getAllBookings() {
+        return bookingRepo.findByDeletedFalse()
+                .stream()
+                .map(bookingMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public BookingResponse updateStatus(Long bookingId, BookingStatus newStatus) {
+        Booking booking = bookingRepo.findByIdAndDeletedFalse(bookingId)
+                .orElseThrow(() -> new ResourceNotFound("Prenotazione con ID " + bookingId + " non trovata."));
+
+        booking.setStatus(newStatus);
+        Booking updated = bookingRepo.save(booking);
+
+        return bookingMapper.toResponse(updated);
+    }
+
+    @Transactional
+    public void AdminDeleteBooking(Long bookingId) {
+        Booking booking = bookingRepo.findByIdAndDeletedFalse(bookingId)
             .orElseThrow(() -> new ResourceNotFound("Prenotazione non trovata."));
 
         booking.setDeleted(true);
