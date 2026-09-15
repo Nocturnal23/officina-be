@@ -12,13 +12,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.officina.officina_be.core.utils.Constants.BookingStatus;
 import com.officina.officina_be.dto.request.JobAvailabilityRequest;
 import com.officina.officina_be.dto.request.JobRequest;
+import com.officina.officina_be.dto.response.BookingResponse;
 import com.officina.officina_be.dto.response.JobResponse;
+import com.officina.officina_be.dto.response.UserResponse;
 import com.officina.officina_be.dto.response.VehicleResponse;
+import com.officina.officina_be.services.BookingService;
 import com.officina.officina_be.services.JobService;
+import com.officina.officina_be.services.UserService;
 import com.officina.officina_be.services.VehicleService;
 
 import jakarta.validation.Valid;
@@ -30,11 +36,15 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
     private final VehicleService vehicleService;
     private final JobService jobService;
+    private final BookingService bookingService;
+    private final UserService userService;
 
     @GetMapping("vehicles/{vehicleId}")
     public ResponseEntity<VehicleResponse> getVehicleById(@PathVariable Long vehicleId) {
         return ResponseEntity.ok(vehicleService.getVehicleById(vehicleId));
     }
+
+    /*------------------------------------------------------------------------------------------*/
 
     @PostMapping("/jobs")
     public ResponseEntity<JobResponse> registerJob(
@@ -71,4 +81,32 @@ public class AdminController {
             jobService.updateAvailability(jobId, request)
         );
     }
+
+    /*------------------------------------------------------------------------------------------*/
+
+    @GetMapping("/bookings")
+    public ResponseEntity<List<BookingResponse>> getAllBookings() {
+        return ResponseEntity.ok(bookingService.getAllBookings());
+    }
+
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId) {
+        return ResponseEntity.ok(userService.getUserByID(userId));
+    }
+
+    @PatchMapping("/bookings/{bookingId}/status")
+    public ResponseEntity<BookingResponse> updateBookingStatus(
+        @PathVariable Long bookingId,
+        @RequestParam BookingStatus status
+    ) {
+        return ResponseEntity.ok(bookingService.updateStatus(bookingId, status));
+    }
+
+    @DeleteMapping("/bookings/{bookingId}")
+	public ResponseEntity<Void> deleteBooking(
+		@PathVariable Long bookingId
+	) {
+		bookingService.AdminDeleteBooking(bookingId);
+		return ResponseEntity.noContent().build();
+	}
 }
