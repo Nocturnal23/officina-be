@@ -10,7 +10,6 @@ public class Constants {
         PENDING,
         CONFIRMED,
         IN_PROGRESS,
-        COMPLETED,
-        CANCELLED
+        COMPLETED
     };
 }
