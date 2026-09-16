@@ -17,4 +17,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Optional<Booking> findByIdAndUser_IdAndDeletedFalse(Long bookingId, Long userId);
     List<Booking> findByDeletedFalse();
     List<Booking> findByStatusAndDeletedFalse(BookingStatus status);
+    List<Booking> findByUser_IdAndStatusInAndDeletedFalse(Long userId, List<BookingStatus> statuses);
 }
