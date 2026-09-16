@@ -57,4 +57,11 @@ public class BookingController {
 		bookingService.deleteBooking(bookingId, user.getId());
 		return ResponseEntity.noContent().build();
 	}
+
+	@GetMapping("/history")
+	public ResponseEntity<List<BookingResponse>> getHistoricalBookings(
+		@AuthenticationPrincipal User user
+	) {
+		return ResponseEntity.ok(bookingService.getBookingHistoryByUserId(user.getId()));
+	}
 }

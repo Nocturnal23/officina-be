@@ -115,4 +115,17 @@ public class BookingService {
         booking.setDeleted(true);
         bookingRepo.save(booking);
     }
+
+    @Transactional
+    public List<BookingResponse> getBookingHistoryByUserId(Long userId) {
+        userRepo.findByIdAndDeletedFalse(userId)
+            .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
+
+        List<BookingStatus> historyStatuses = List.of(BookingStatus.COMPLETED, BookingStatus.REFUSED);
+
+        return bookingRepo.findByUser_IdAndStatusInAndDeletedFalse(userId, historyStatuses)
+            .stream()
+            .map(bookingMapper::toResponse)
+            .toList();
+    }
 }
