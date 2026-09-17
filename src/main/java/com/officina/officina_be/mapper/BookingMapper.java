@@ -1,12 +1,15 @@
 package com.officina.officina_be.mapper;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.officina.officina_be.dto.request.BookingRequest;
 import com.officina.officina_be.dto.response.BookingResponse;
+import com.officina.officina_be.dto.response.PageResponse;
 import com.officina.officina_be.entity.Booking;
 import com.officina.officina_be.entity.Jobs;
 
@@ -33,6 +36,22 @@ public class BookingMapper {
             entity.getUser().getId(),
             jobsIds,
             entity.getAppointmentDate()
+        );
+    }
+
+    public PageResponse<BookingResponse> toPageResponse(Page<Booking> page) {
+        List<BookingResponse> content = page.getContent()
+            .stream()
+            .map(this::toResponse)
+            .toList();
+
+        return new PageResponse<>(
+            content,
+            page.getNumber(),
+            page.getSize(),
+            page.getTotalElements(),
+            page.getTotalPages(),
+            page.isLast()
         );
     }
 }
