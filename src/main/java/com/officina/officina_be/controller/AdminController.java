@@ -20,6 +20,7 @@ import com.officina.officina_be.dto.request.JobAvailabilityRequest;
 import com.officina.officina_be.dto.request.JobRequest;
 import com.officina.officina_be.dto.response.BookingResponse;
 import com.officina.officina_be.dto.response.JobResponse;
+import com.officina.officina_be.dto.response.PageResponse;
 import com.officina.officina_be.dto.response.UserResponse;
 import com.officina.officina_be.dto.response.VehicleResponse;
 import com.officina.officina_be.services.BookingService;
@@ -85,8 +86,12 @@ public class AdminController {
     /*------------------------------------------------------------------------------------------*/
 
     @GetMapping("/bookings")
-    public ResponseEntity<List<BookingResponse>> getAllBookings() {
-        return ResponseEntity.ok(bookingService.getAllBookings());
+    public ResponseEntity<PageResponse<BookingResponse>> getAllBookings(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) List<BookingStatus> statuses
+    ) {
+        return ResponseEntity.ok(bookingService.getAllBookings(page, size, statuses));
     }
 
     @GetMapping("/users/{userId}")
