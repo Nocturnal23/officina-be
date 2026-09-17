@@ -114,4 +114,9 @@ public class AdminController {
 		bookingService.AdminDeleteBooking(bookingId);
 		return ResponseEntity.noContent().build();
 	}
+
+    @GetMapping("/bookings/summary")
+    public ResponseEntity<Map<BookingStatus, Long>> getBookingSummary() {
+        return ResponseEntity.ok(bookingService.getBookingStatusSummary());
+    }
 }
