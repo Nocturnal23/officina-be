@@ -4,12 +4,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
 import com.officina.officina_be.dto.request.BookingRequest;
 import com.officina.officina_be.dto.response.BookingResponse;
+import com.officina.officina_be.dto.response.PageResponse;
 import com.officina.officina_be.entity.Booking;
 import com.officina.officina_be.entity.Jobs;
 import com.officina.officina_be.entity.User;
@@ -58,14 +63,21 @@ public class BookingService {
     }
 
     @Transactional
-    public List<BookingResponse> getBookingByUserId(Long userId) {
+    public PageResponse<BookingResponse> getBookingByUserId(Long userId, int page, int size, List<BookingStatus> statuses) {
         userRepo.findByIdAndDeletedFalse(userId)
             .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
 
-        return bookingRepo.findByUser_IdAndDeletedFalse(userId)
-                .stream()
-                .map(bookingMapper::toResponse)
-                .toList();
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").ascending());
+
+        Page<Booking> bookingPage;
+
+        if (statuses == null || statuses.isEmpty()) {
+            bookingPage = bookingRepo.findByUser_IdAndDeletedFalse(userId, pageable);
+        } else {
+            bookingPage = bookingRepo.findByUser_IdAndStatusInAndDeletedFalse(userId, statuses, pageable);
+        }
+
+       return bookingMapper.toPageResponse(bookingPage);
     }
 
     @Transactional
@@ -89,11 +101,17 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookingResponse> getAllBookings() {
-        return bookingRepo.findByDeletedFalse()
-                .stream()
-                .map(bookingMapper::toResponse)
-                .toList();
+    public PageResponse<BookingResponse> getAllBookings(int page, int size, List<BookingStatus> statuses) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+
+        Page<Booking> bookingPage;
+        if (statuses == null || statuses.isEmpty()) {
+            bookingPage = bookingRepo.findByDeletedFalse(pageable);
+        } else {
+            bookingPage = bookingRepo.findByStatusInAndDeletedFalse(statuses, pageable);
+        }
+
+        return bookingMapper.toPageResponse(bookingPage);
     }
 
     @Transactional
@@ -117,15 +135,17 @@ public class BookingService {
     }
 
     @Transactional
-    public List<BookingResponse> getBookingHistoryByUserId(Long userId) {
+    public PageResponse<BookingResponse> getBookingHistoryByUserId(Long userId, int page, int size, List<BookingStatus> filterStatuses) {
         userRepo.findByIdAndDeletedFalse(userId)
             .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
 
-        List<BookingStatus> historyStatuses = List.of(BookingStatus.COMPLETED, BookingStatus.REFUSED);
+        if (filterStatuses == null || filterStatuses.isEmpty()) {
+            filterStatuses = List.of(BookingStatus.COMPLETED, BookingStatus.REFUSED);
+        }
 
-        return bookingRepo.findByUser_IdAndStatusInAndDeletedFalse(userId, historyStatuses)
-            .stream()
-            .map(bookingMapper::toResponse)
-            .toList();
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+        Page<Booking> bookingPage = bookingRepo.findByUser_IdAndStatusInAndDeletedFalse(userId, filterStatuses, pageable);
+
+        return bookingMapper.toPageResponse(bookingPage);
     }
 }

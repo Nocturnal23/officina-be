@@ -10,10 +10,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.officina.officina_be.core.utils.Constants.BookingStatus;
 import com.officina.officina_be.dto.request.BookingRequest;
 import com.officina.officina_be.dto.response.BookingResponse;
+import com.officina.officina_be.dto.response.PageResponse;
 import com.officina.officina_be.entity.User;
 import com.officina.officina_be.services.BookingService;
 
@@ -43,10 +46,15 @@ public class BookingController {
 	}
 
     @GetMapping("/bookings")
-    public ResponseEntity<List<BookingResponse>> getBookings(
-        @AuthenticationPrincipal User user
+    public ResponseEntity<PageResponse<BookingResponse>> getBookings(
+        @AuthenticationPrincipal User user,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(required = false) List<BookingStatus> statuses
     ) {
-        return ResponseEntity.ok(bookingService.getBookingByUserId(user.getId()));
+        return ResponseEntity.ok(
+			bookingService.getBookingByUserId(user.getId(), page, size, statuses)
+    	);
     }
 
     @DeleteMapping("/bookings/{bookingId}")
@@ -59,9 +67,14 @@ public class BookingController {
 	}
 
 	@GetMapping("/history")
-	public ResponseEntity<List<BookingResponse>> getHistoricalBookings(
-		@AuthenticationPrincipal User user
+	public ResponseEntity<PageResponse<BookingResponse>> getHistoricalBookings(
+		@AuthenticationPrincipal User user,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(required = false) List<BookingStatus> statuses
 	) {
-		return ResponseEntity.ok(bookingService.getBookingHistoryByUserId(user.getId()));
+		return ResponseEntity.ok(
+			bookingService.getBookingHistoryByUserId(user.getId(), page, size, statuses)
+		);
 	}
 }
