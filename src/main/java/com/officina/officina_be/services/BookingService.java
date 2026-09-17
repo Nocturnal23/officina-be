@@ -2,7 +2,9 @@ package com.officina.officina_be.services;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,6 +24,7 @@ import com.officina.officina_be.entity.Vehicle;
 import com.officina.officina_be.error.ResourceNotFound;
 import com.officina.officina_be.mapper.BookingMapper;
 import com.officina.officina_be.repository.BookingRepository;
+import com.officina.officina_be.repository.BookingRepository.BookingStatusCount;
 import com.officina.officina_be.repository.JobsRepository;
 import com.officina.officina_be.repository.UserRepository;
 import com.officina.officina_be.repository.VehicleRepository;
@@ -38,15 +41,14 @@ public class BookingService {
     private final JobsRepository jobsRepo;
 
     @Transactional
-    public BookingResponse saveBooking(BookingRequest request, Long vehicleId, Long userId){
+    public BookingResponse saveBooking(BookingRequest request, Long vehicleId, Long userId) {
         Vehicle vehicle = vehicleRepo.findByIdAndUser_IdAndDeletedFalse(vehicleId, userId)
-            .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
+                .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
         User user = userRepo.findByIdAndDeletedFalse(userId)
-            .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
+                .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
 
         Set<Jobs> jobs = new HashSet<>(
-            jobsRepo.findByIdInAndDeletedFalse(request.jobsIds())
-        );
+                jobsRepo.findByIdInAndDeletedFalse(request.jobsIds()));
 
         if (jobs.size() != request.jobsIds().size()) {
             throw new ResourceNotFound("Uno o più lavori non sono disponibili.");
@@ -63,9 +65,10 @@ public class BookingService {
     }
 
     @Transactional
-    public PageResponse<BookingResponse> getBookingByUserId(Long userId, int page, int size, List<BookingStatus> statuses) {
+    public PageResponse<BookingResponse> getBookingByUserId(Long userId, int page, int size,
+            List<BookingStatus> statuses) {
         userRepo.findByIdAndDeletedFalse(userId)
-            .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
+                .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").ascending());
 
@@ -77,13 +80,13 @@ public class BookingService {
             bookingPage = bookingRepo.findByUser_IdAndStatusInAndDeletedFalse(userId, statuses, pageable);
         }
 
-       return bookingMapper.toPageResponse(bookingPage);
+        return bookingMapper.toPageResponse(bookingPage);
     }
 
     @Transactional
     public List<BookingResponse> getBookingByVehicleId(Long vehicleId) {
         vehicleRepo.findByIdAndDeletedFalse(vehicleId)
-            .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
+                .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
 
         return bookingRepo.findByVehicle_IdAndDeletedFalse(vehicleId)
                 .stream()
@@ -94,7 +97,7 @@ public class BookingService {
     @Transactional
     public void deleteBooking(Long bookingId, Long userId) {
         Booking booking = bookingRepo.findByIdAndUser_IdAndDeletedFalse(bookingId, userId)
-            .orElseThrow(() -> new ResourceNotFound("Prenotazione non trovata."));
+                .orElseThrow(() -> new ResourceNotFound("Prenotazione non trovata."));
 
         booking.setDeleted(true);
         bookingRepo.save(booking);
@@ -128,24 +131,34 @@ public class BookingService {
     @Transactional
     public void AdminDeleteBooking(Long bookingId) {
         Booking booking = bookingRepo.findByIdAndDeletedFalse(bookingId)
-            .orElseThrow(() -> new ResourceNotFound("Prenotazione non trovata."));
+                .orElseThrow(() -> new ResourceNotFound("Prenotazione non trovata."));
 
         booking.setDeleted(true);
         bookingRepo.save(booking);
     }
 
     @Transactional
-    public PageResponse<BookingResponse> getBookingHistoryByUserId(Long userId, int page, int size, List<BookingStatus> filterStatuses) {
+    public PageResponse<BookingResponse> getBookingHistoryByUserId(Long userId, int page, int size,
+            List<BookingStatus> filterStatuses) {
         userRepo.findByIdAndDeletedFalse(userId)
-            .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
+                .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
 
         if (filterStatuses == null || filterStatuses.isEmpty()) {
             filterStatuses = List.of(BookingStatus.COMPLETED, BookingStatus.REFUSED);
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
-        Page<Booking> bookingPage = bookingRepo.findByUser_IdAndStatusInAndDeletedFalse(userId, filterStatuses, pageable);
+        Page<Booking> bookingPage = bookingRepo.findByUser_IdAndStatusInAndDeletedFalse(userId, filterStatuses,
+                pageable);
 
         return bookingMapper.toPageResponse(bookingPage);
+    }
+
+    @Transactional()
+    public Map<BookingStatus, Long> getBookingStatusSummary() {
+        return bookingRepo.countBookingsByStatus().stream()
+                .collect(Collectors.toMap(
+                        BookingStatusCount::getStatus,
+                        BookingStatusCount::getCount));
     }
 }
