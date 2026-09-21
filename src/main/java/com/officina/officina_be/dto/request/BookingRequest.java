@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 public record BookingRequest(
     @Size(max = 500, message = "Il messaggio non può eccedere i 500 caratteri!")
-    String notes, //Potrebbero essere vuote
+    String notes,
     
     @NotNull
     Set<Long> jobsIds,

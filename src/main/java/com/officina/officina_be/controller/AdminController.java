@@ -16,14 +16,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
+import com.officina.officina_be.dto.request.InterventionHistoryRequest;
 import com.officina.officina_be.dto.request.JobAvailabilityRequest;
 import com.officina.officina_be.dto.request.JobRequest;
 import com.officina.officina_be.dto.response.BookingResponse;
+import com.officina.officina_be.dto.response.InterventionHistoryResponse;
 import com.officina.officina_be.dto.response.JobResponse;
 import com.officina.officina_be.dto.response.PageResponse;
 import com.officina.officina_be.dto.response.UserResponse;
 import com.officina.officina_be.dto.response.VehicleResponse;
 import com.officina.officina_be.services.BookingService;
+import com.officina.officina_be.services.InterventionHistoryService;
 import com.officina.officina_be.services.JobService;
 import com.officina.officina_be.services.UserService;
 import com.officina.officina_be.services.VehicleService;
@@ -39,6 +42,7 @@ public class AdminController {
     private final JobService jobService;
     private final BookingService bookingService;
     private final UserService userService;
+    private final InterventionHistoryService interventionHistoryService;
 
     @GetMapping("vehicles/{vehicleId}")
     public ResponseEntity<VehicleResponse> getVehicleById(@PathVariable Long vehicleId) {
@@ -118,5 +122,34 @@ public class AdminController {
     @GetMapping("/bookings/summary")
     public ResponseEntity<Map<BookingStatus, Long>> getBookingSummary() {
         return ResponseEntity.ok(bookingService.getBookingStatusSummary());
+    }
+
+    /*------------------------------------------------------------------------------------------*/
+
+    @PostMapping("/vehicles/{vehicleId}/interventions")
+	public ResponseEntity<InterventionHistoryResponse> createIntervention(
+		@PathVariable Long vehicleId,
+		@Valid @RequestBody InterventionHistoryRequest request
+	) {
+		InterventionHistoryResponse response = interventionHistoryService.saveIntervention(
+			request,
+			vehicleId
+		);
+
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+
+    @PatchMapping("/interventions/{id}")
+    public ResponseEntity<InterventionHistoryResponse> updateIntervention(
+        @PathVariable Long id,
+        @Valid @RequestBody InterventionHistoryRequest request
+    ) {
+        return ResponseEntity.ok(interventionHistoryService.updateIntervention(id, request));
+    }
+
+    @DeleteMapping("/interventions/{id}")
+    public ResponseEntity<Void> deleteIntervention(@PathVariable Long id) {
+        interventionHistoryService.deleteIntervention(id);
+        return ResponseEntity.noContent().build();
     }
 }

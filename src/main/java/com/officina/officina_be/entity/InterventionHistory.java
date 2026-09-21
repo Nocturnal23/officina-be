@@ -1,14 +1,17 @@
 package com.officina.officina_be.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.officina.officina_be.core.templates.BaseEntity;
+import com.officina.officina_be.core.utils.Constants.BookingStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,24 +40,22 @@ public class InterventionHistory extends BaseEntity {
     @Column(name = "intervention_history_id", nullable = false, unique = true)
     private Long id;
     
-    @Column(name = "kilometers", nullable = false)
+    @Column(name = "kilometers", nullable = true)
     private Long kilometers;
 
-    @Column(name = "cost", nullable = false)
+    @Column(name = "cost", nullable = true)
     private double cost;
 
     @Column(name = "notes", nullable = true)
     private String notes;
 
-    @Column(name = "completed_at")
-    private LocalDateTime completedAt;
+    @Column(name = "completed_at", nullable = false)
+    private LocalDate completedAt;
 
-    //Associazione intervento/veicolo.
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vehicle_id", nullable = false)
+    @JoinColumn(name = "vehicle_id", nullable = true)
     private Vehicle vehicle;
 
-    //Associazione per intervento/prenotazione
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", nullable = true)
     private Booking booking;
@@ -66,4 +67,8 @@ public class InterventionHistory extends BaseEntity {
         inverseJoinColumns = @JoinColumn(name = "service_id")
     )
     private Set<Jobs> jobs = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = true)
+    private BookingStatus status = BookingStatus.REFUSED;
 }
