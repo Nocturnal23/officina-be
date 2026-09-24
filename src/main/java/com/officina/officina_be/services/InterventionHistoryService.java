@@ -13,8 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
 import com.officina.officina_be.dto.request.InterventionHistoryRequest;
+import com.officina.officina_be.dto.response.BookingResponse;
 import com.officina.officina_be.dto.response.InterventionHistoryResponse;
 import com.officina.officina_be.dto.response.PageResponse;
+import com.officina.officina_be.entity.Booking;
 import com.officina.officina_be.entity.InterventionHistory;
 import com.officina.officina_be.entity.Jobs;
 import com.officina.officina_be.entity.Vehicle;
@@ -95,5 +97,21 @@ public class InterventionHistoryService {
 
         InterventionHistory updated = interventionHistoryRepo.save(intervention);
         return interventionHistoryMapper.toResponse(updated);
+    }
+
+    @Transactional
+    public PageResponse<InterventionHistoryResponse> getInterventionsHistoryByVehicleId(Long vehicleId, int page, int size,
+            List<BookingStatus> filterStatuses) {
+        vehicleRepo.findByIdAndDeletedFalse(vehicleId)
+                .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
+
+        if (filterStatuses == null || filterStatuses.isEmpty()) {
+            filterStatuses = List.of(BookingStatus.COMPLETED, BookingStatus.REFUSED);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+        Page<InterventionHistory> interventionPage = interventionHistoryRepo.findByVehicle_IdAndStatusInAndDeletedFalse(vehicleId, filterStatuses, pageable);
+
+        return interventionHistoryMapper.toPageResponse(interventionPage);
     }
 }
