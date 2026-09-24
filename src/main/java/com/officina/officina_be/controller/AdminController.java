@@ -44,12 +44,25 @@ public class AdminController {
     private final UserService userService;
     private final InterventionHistoryService interventionHistoryService;
 
+    /*USER*/
+    
+    @GetMapping("/users")
+    public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String query
+    ) {
+        return ResponseEntity.ok(userService.getAllUsers(page, size, query));
+    }
+
+    /*VEHICLE*/
+
     @GetMapping("vehicles/{vehicleId}")
     public ResponseEntity<VehicleResponse> getVehicleById(@PathVariable Long vehicleId) {
         return ResponseEntity.ok(vehicleService.getVehicleById(vehicleId));
     }
 
-    /*------------------------------------------------------------------------------------------*/
+    /*JOB*/
 
     @PostMapping("/jobs")
     public ResponseEntity<JobResponse> registerJob(
@@ -87,7 +100,7 @@ public class AdminController {
         );
     }
 
-    /*------------------------------------------------------------------------------------------*/
+    /*BOOKING*/
 
     @GetMapping("/bookings")
     public ResponseEntity<PageResponse<BookingResponse>> getAllBookings(
@@ -124,7 +137,7 @@ public class AdminController {
         return ResponseEntity.ok(bookingService.getBookingStatusSummary());
     }
 
-    /*------------------------------------------------------------------------------------------*/
+    /*INTERVENTION*/
 
     @PostMapping("/vehicles/{vehicleId}/interventions")
 	public ResponseEntity<InterventionHistoryResponse> createIntervention(

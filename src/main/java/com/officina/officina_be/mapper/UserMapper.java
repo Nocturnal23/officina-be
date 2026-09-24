@@ -1,9 +1,15 @@
 package com.officina.officina_be.mapper;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.officina.officina_be.dto.request.UserRequest;
+import com.officina.officina_be.dto.response.BookingResponse;
+import com.officina.officina_be.dto.response.PageResponse;
 import com.officina.officina_be.dto.response.UserResponse;
+import com.officina.officina_be.entity.Booking;
 import com.officina.officina_be.entity.User;
 
 @Component
@@ -28,6 +34,23 @@ public class UserMapper {
             entity.getLastName(),
             entity.getPhoneNumber(),
             entity.getRole()
+        );
+    }
+
+
+    public PageResponse<UserResponse> toPageResponse(Page<User> page) {
+        List<UserResponse> content = page.getContent()
+            .stream()
+            .map(this::toResponse)
+            .toList();
+
+        return new PageResponse<>(
+            content,
+            page.getNumber(),
+            page.getSize(),
+            page.getTotalElements(),
+            page.getTotalPages(),
+            page.isLast()
         );
     }
 }
