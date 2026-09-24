@@ -3,6 +3,10 @@ package com.officina.officina_be.services;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +25,8 @@ import com.officina.officina_be.error.Unauthorized;
 import com.officina.officina_be.mapper.UserMapper;
 import com.officina.officina_be.repository.UserRepository;
 import com.officina.officina_be.repository.VehicleRepository;
+import com.officina.officina_be.dto.response.PageResponse;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -107,5 +113,21 @@ public class UserService {
             
         user.setDeleted(true);
         userRepo.save(user);
+    }
+
+    @Transactional 
+    public PageResponse<UserResponse> getAllUsers(int page, int size, String keyword) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("lastName").descending());
+
+        Page<User> userPage;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            userPage = userRepo.searchUsers(keyword.trim(), pageable);
+        } else {
+            userPage = userRepo.findByDeletedFalse(pageable);
+        }
+
+
+        return userMapper.toPageResponse(userPage);
     }
 }
