@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class InterventionHistoryController {
     private final InterventionHistoryService interventionHistoryService;
 
-    @GetMapping("/history/{vehicleId}")
+    @GetMapping("/history/interventions")
     public ResponseEntity<PageResponse<InterventionHistoryResponse>> getMyVehicleInterventions(
         @PathVariable Long vehicleId,
         @RequestParam(defaultValue = "0") int page,
@@ -31,7 +31,7 @@ public class InterventionHistoryController {
     ) {
         
         return ResponseEntity.ok(
-            interventionHistoryService.getInterventionsByVehicleId(vehicleId, page, size, statuses)
+            interventionHistoryService.getInterventionsHistoryByVehicleId(vehicleId, page, size, statuses)
         );
     }
 
