@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
 import com.officina.officina_be.dto.request.InterventionHistoryRequest;
-import com.officina.officina_be.dto.response.BookingResponse;
 import com.officina.officina_be.dto.response.InterventionHistoryResponse;
 import com.officina.officina_be.dto.response.PageResponse;
 import com.officina.officina_be.entity.Booking;
@@ -22,6 +21,7 @@ import com.officina.officina_be.entity.Jobs;
 import com.officina.officina_be.entity.Vehicle;
 import com.officina.officina_be.error.ResourceNotFound;
 import com.officina.officina_be.mapper.InterventionHistoryMapper;
+import com.officina.officina_be.repository.BookingRepository;
 import com.officina.officina_be.repository.InterventionHistoryRepository;
 import com.officina.officina_be.repository.JobsRepository;
 import com.officina.officina_be.repository.VehicleRepository;
@@ -34,6 +34,7 @@ public class InterventionHistoryService {
     private final VehicleRepository vehicleRepo;
     private final JobsRepository jobsRepo;
     private final InterventionHistoryRepository interventionHistoryRepo;
+    private final BookingRepository bookingRepo;
 
     private final InterventionHistoryMapper interventionHistoryMapper;
 
@@ -48,6 +49,12 @@ public class InterventionHistoryService {
         InterventionHistory interventionHistory = interventionHistoryMapper.toEntity(request);
         interventionHistory.setVehicle(vehicle);
         interventionHistory.setJobs(jobs);
+
+        if (request.bookingId() != null) {
+            Booking booking = bookingRepo.findById(request.bookingId())
+                    .orElseThrow(() -> new ResourceNotFound("Prenotazione non trovata."));
+            interventionHistory.setBooking(booking);
+        }
 
         InterventionHistory savedIntervention = interventionHistoryRepo.save(interventionHistory);
 

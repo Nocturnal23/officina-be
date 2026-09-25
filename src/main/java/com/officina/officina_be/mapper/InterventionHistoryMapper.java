@@ -32,6 +32,8 @@ public class InterventionHistoryMapper {
             .map(Jobs::getId)
             .collect(Collectors.toSet());
 
+        Long safeBookingId = entity.getBooking() != null ? entity.getBooking().getId() : null;
+
         return new InterventionHistoryResponse(
             entity.getId(),
             entity.getKilometers(),
@@ -39,7 +41,7 @@ public class InterventionHistoryMapper {
             entity.getNotes(),
             entity.getCompletedAt(),
             entity.getVehicle().getId(),
-            entity.getBooking().getId(),
+            safeBookingId,
             jobsIds,
             entity.getStatus()
         );
