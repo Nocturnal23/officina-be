@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.officina.officina_be.core.templates.BaseEntity;
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
 
@@ -49,6 +51,7 @@ public class InterventionHistory extends BaseEntity {
     @Column(name = "notes", nullable = true)
     private String notes;
 
+    @CreationTimestamp
     @Column(name = "completed_at", nullable = false)
     private LocalDate completedAt;
 
