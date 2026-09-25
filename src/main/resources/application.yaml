@@ -24,3 +24,12 @@ spring:
         jwt:
             secret: jw3eMKhpU7SjPFexr62OZJt3rI/bVJI3CTXCfDltws0=
             expiration-ms: 28800000
+
+    logging:
+        level:
+            root: "warn"
+            org.springframework.web: "debug"
+            org.hibernate: "error"
+
+            application:
+                name: officina-be
