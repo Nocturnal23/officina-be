@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 public record InterventionHistoryRequest( 
     Long kilometers,
 
-    double cost,
+    Double cost,
 
     @Size(max = 500, message = "Il messaggio non può eccedere i 500 caratteri!")
     String notes,

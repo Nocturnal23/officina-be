@@ -46,7 +46,7 @@ public class InterventionHistory extends BaseEntity {
     private Long kilometers;
 
     @Column(name = "cost", nullable = true)
-    private double cost;
+    private Double cost;
 
     @Column(name = "notes", nullable = true)
     private String notes;
