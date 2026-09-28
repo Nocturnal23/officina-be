@@ -165,4 +165,10 @@ public class AdminController {
         interventionHistoryService.deleteIntervention(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/vehicles/{vehicleId}/kilometers")
+    public ResponseEntity<Long> getLastVehicleKilometers(@PathVariable Long vehicleId) {
+        Long lastKm = interventionHistoryService.getLastVehicleKilometers(vehicleId);
+        return ResponseEntity.ok(lastKm);
+    }
 }
