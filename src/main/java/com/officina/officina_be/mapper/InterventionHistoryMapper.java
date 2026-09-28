@@ -32,12 +32,13 @@ public class InterventionHistoryMapper {
             .map(Jobs::getId)
             .collect(Collectors.toSet());
 
+        Double safeCost = entity.getCost() != null ? entity.getCost() : 0;
         Long safeBookingId = entity.getBooking() != null ? entity.getBooking().getId() : null;
 
         return new InterventionHistoryResponse(
             entity.getId(),
             entity.getKilometers(),
-            entity.getCost(),
+            safeCost,
             entity.getNotes(),
             entity.getCompletedAt(),
             entity.getVehicle().getId(),
