@@ -2,6 +2,7 @@ package com.officina.officina_be.services;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -42,6 +43,11 @@ public class InterventionHistoryService {
     public InterventionHistoryResponse saveIntervention(InterventionHistoryRequest request, Long vehicleId) {
         Vehicle vehicle = vehicleRepo.findByIdAndDeletedFalse(vehicleId)
                 .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
+
+        Long lastKm = getLastVehicleKilometers(vehicleId);
+        if (request.kilometers() != null && request.kilometers() < lastKm) {
+            throw new IllegalArgumentException("I chilometri inseriti (" + request.kilometers() + ") sono inferiori a quelli dell'ultimo intervento (" + lastKm + ").");
+        }
 
         Set<Jobs> jobs = new HashSet<>(
                 jobsRepo.findByIdInAndDeletedFalse(request.jobsIds()));
@@ -120,5 +126,16 @@ public class InterventionHistoryService {
         Page<InterventionHistory> interventionPage = interventionHistoryRepo.findByVehicle_IdAndStatusInAndDeletedFalse(vehicleId, filterStatuses, pageable);
 
         return interventionHistoryMapper.toPageResponse(interventionPage);
+    }
+
+    @Transactional 
+    public Long getLastVehicleKilometers(Long vehicleId) {
+        Optional<InterventionHistory> lastIntervention = interventionHistoryRepo.findFirstByVehicle_IdOrderByCompletedAtDesc(vehicleId);
+        
+        if (lastIntervention.isPresent() && lastIntervention.get().getKilometers() != null) {
+            return lastIntervention.get().getKilometers();
+        }
+        
+        return 0L;
     }
 }
