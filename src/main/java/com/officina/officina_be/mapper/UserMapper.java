@@ -6,10 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.officina.officina_be.dto.request.UserRequest;
-import com.officina.officina_be.dto.response.BookingResponse;
 import com.officina.officina_be.dto.response.PageResponse;
 import com.officina.officina_be.dto.response.UserResponse;
-import com.officina.officina_be.entity.Booking;
 import com.officina.officina_be.entity.User;
 
 @Component
