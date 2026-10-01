@@ -1,6 +1,7 @@
 package com.officina.officina_be.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,17 +24,31 @@ public class VehicleService {
     private final VehicleRepository vehicleRepo;
     private final UserRepository userRepo;
     private final VehicleMapper vehicleMapper;
-     
+
     @Transactional
     public VehicleResponse saveVehicle(VehicleRequest request, Long userId) {
-        if(vehicleRepo.existsByPlateIgnoreCaseAndDeletedFalse(request.plate())) {
-            throw new DuplicateResource("Attenzione, la targa inserita è già associata a un altro veicolo");
-        }
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFound("Utente con ID " + userId + " non trovato."));
 
-        User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFound("Utente con ID " + userId + " non trovato."));
-        
-        Vehicle vehicle = vehicleMapper.toEntity(request);
-        vehicle.setUser(user);
+        Vehicle vehicle = vehicleRepo.findByPlateIgnoreCase(request.plate())
+                .map(existing -> {
+                    if (!existing.isDeleted()) {
+                        throw new DuplicateResource(
+                                "Attenzione, la targa inserita è già associata a un altro veicolo attivo.");
+                    }
+
+                    existing.setUser(user);
+                    existing.setDeleted(false);
+                    existing.setBrand(request.brand());
+                    existing.setModel(request.model());
+
+                    return existing;
+                })
+                .orElseGet(() -> {
+                    Vehicle newVehicle = vehicleMapper.toEntity(request);
+                    newVehicle.setUser(user);
+                    return newVehicle;
+                });
 
         Vehicle savedVehicle = vehicleRepo.save(vehicle);
         return vehicleMapper.toResponse(savedVehicle);
@@ -54,7 +69,7 @@ public class VehicleService {
     @Transactional
     public void deleteVehicle(Long vehicleId, Long userId) {
         Vehicle vehicle = vehicleRepo.findByIdAndUser_IdAndDeletedFalse(vehicleId, userId)
-            .orElseThrow(() -> new ResourceNotFound("Veicolo con ID " + vehicleId + " non trovato."));
+                .orElseThrow(() -> new ResourceNotFound("Veicolo con ID " + vehicleId + " non trovato."));
 
         vehicle.setDeleted(true);
         vehicleRepo.save(vehicle);
@@ -63,7 +78,7 @@ public class VehicleService {
     @Transactional
     public VehicleResponse getVehicleById(Long vehicleId) {
         Vehicle vehicle = vehicleRepo.findByIdAndDeletedFalse(vehicleId)
-            .orElseThrow(() -> new ResourceNotFound("Veicolo con ID " + vehicleId + " non trovato."));
+                .orElseThrow(() -> new ResourceNotFound("Veicolo con ID " + vehicleId + " non trovato."));
         return vehicleMapper.toResponse(vehicle);
     }
 }
