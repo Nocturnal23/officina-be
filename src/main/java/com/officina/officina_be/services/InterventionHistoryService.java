@@ -25,6 +25,7 @@ import com.officina.officina_be.mapper.InterventionHistoryMapper;
 import com.officina.officina_be.repository.BookingRepository;
 import com.officina.officina_be.repository.InterventionHistoryRepository;
 import com.officina.officina_be.repository.JobsRepository;
+import com.officina.officina_be.repository.UserRepository;
 import com.officina.officina_be.repository.VehicleRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class InterventionHistoryService {
     private final JobsRepository jobsRepo;
     private final InterventionHistoryRepository interventionHistoryRepo;
     private final BookingRepository bookingRepo;
+    private final UserRepository userRepo;
 
     private final InterventionHistoryMapper interventionHistoryMapper;
 
@@ -113,17 +115,16 @@ public class InterventionHistoryService {
     }
 
     @Transactional
-    public PageResponse<InterventionHistoryResponse> getInterventionsHistoryByVehicleId(Long vehicleId, int page, int size,
-            List<BookingStatus> filterStatuses) {
-        vehicleRepo.findByIdAndDeletedFalse(vehicleId)
-                .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
+    public PageResponse<InterventionHistoryResponse> getInterventionsHistoryByUserId(Long userId, int page, int size, List<BookingStatus> filterStatuses) {
+        userRepo.findByIdAndDeletedFalse(userId)
+                .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
 
         if (filterStatuses == null || filterStatuses.isEmpty()) {
             filterStatuses = List.of(BookingStatus.COMPLETED, BookingStatus.REFUSED);
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
-        Page<InterventionHistory> interventionPage = interventionHistoryRepo.findByVehicle_IdAndStatusInAndDeletedFalse(vehicleId, filterStatuses, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("completedAt").descending());
+        Page<InterventionHistory> interventionPage = interventionHistoryRepo.findByVehicleUserIdAndStatusIn(userId, filterStatuses, pageable);
 
         return interventionHistoryMapper.toPageResponse(interventionPage);
     }
