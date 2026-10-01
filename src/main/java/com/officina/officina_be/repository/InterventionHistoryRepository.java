@@ -14,10 +14,8 @@ import com.officina.officina_be.entity.InterventionHistory;
 @Repository 
 public interface InterventionHistoryRepository extends JpaRepository<InterventionHistory, Long>{
     Optional<InterventionHistory> findByIdAndDeletedFalse(Long id);
-    // List<InterventionHistory> findByVehicle_IdAndDeletedFalse(Long vehicleId);
     Page<InterventionHistory> findByVehicle_IdAndDeletedFalse(Long vehicleId, Pageable pageable);
     Page<InterventionHistory> findByVehicle_IdAndStatusInAndDeletedFalse(Long vehicleId, List<BookingStatus> statuses, Pageable pageable);
     Optional<InterventionHistory> findFirstByVehicle_IdOrderByCompletedAtDesc(Long vehicleId);
     Page<InterventionHistory> findByVehicleUserIdAndStatusIn(Long userId, List<BookingStatus> statuses, Pageable pageable);
-    //TODO: Aggiungere altro eventualmente.
 }

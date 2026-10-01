@@ -42,7 +42,6 @@ public class Vehicle extends BaseEntity {
     @Column(name = "plate", nullable = false)
     private String plate;
 
-    //Mappare la logica per l'associazione veicolo/utente.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
