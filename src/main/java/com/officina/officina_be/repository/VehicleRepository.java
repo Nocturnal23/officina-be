@@ -22,4 +22,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     boolean existsByPlateIgnoreCaseAndDeletedFalse(String plate);
 
     Optional<Vehicle> findByIdAndUser_IdAndDeletedFalse(Long vehicleId, Long userId);
+
+    Optional<Vehicle> findByPlateIgnoreCase(String plate);
 }
