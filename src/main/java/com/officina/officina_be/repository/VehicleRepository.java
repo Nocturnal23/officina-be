@@ -10,13 +10,10 @@ import com.officina.officina_be.entity.Vehicle;
 
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
-    //Ricerca dei veicolo di un utente.
     List<Vehicle> findByUser_IdAndDeletedFalse(Long userId);
 
-    //Elimina un veicolo.
     Optional<Vehicle> findByIdAndDeletedFalse(Long id);
 
-    //Evita duplicati sulla targa.
     boolean existsByPlateIgnoreCase(String plate);
 
     boolean existsByPlateIgnoreCaseAndDeletedFalse(String plate);
