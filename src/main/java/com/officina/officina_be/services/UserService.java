@@ -88,6 +88,9 @@ public class UserService {
         if (updates.containsKey("phoneNumber")) {
             user.setPhoneNumber((String) updates.get("phoneNumber"));
         }
+        if (updates.containsKey("email")) {
+            user.setEmail((String) updates.get("email"));
+        }
 
         User savedUser = userRepo.save(user);
         return userMapper.toResponse(savedUser);
