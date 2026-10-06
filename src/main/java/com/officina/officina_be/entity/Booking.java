@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.officina.officina_be.core.templates.BaseEntity;
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
 
@@ -13,6 +16,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,6 +57,7 @@ public class Booking extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @Column(name = "appointment_date", nullable = false)
@@ -61,8 +66,15 @@ public class Booking extends BaseEntity {
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "booking_services",
-        joinColumns = @JoinColumn(name = "booking_id"),
-        inverseJoinColumns = @JoinColumn(name = "service_id")
+        joinColumns = @JoinColumn(
+            name = "booking_id", 
+            foreignKey = @ForeignKey(foreignKeyDefinition = "FOREIGN KEY (booking_id) REFERENCES bookings ON DELETE CASCADE")
+        ),
+        inverseJoinColumns = @JoinColumn(
+            name = "service_id",
+            foreignKey = @ForeignKey(foreignKeyDefinition = "FOREIGN KEY (service_id) REFERENCES jobs ON DELETE RESTRICT")
+        )
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Jobs> jobs = new HashSet<>();
 }
