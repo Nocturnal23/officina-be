@@ -98,6 +98,12 @@ public class UserService {
         return userRepo.findByEmailIgnoreCaseAndDeletedFalse(email)
             .orElseThrow(() -> new ResourceNotFound("Utente non trovato"));
     }
+    
+    @Transactional 
+    public User findById(Long id) {
+        return userRepo.findByIdAndDeletedFalse(id)
+            .orElseThrow(() -> new ResourceNotFound("Utente non trovato"));
+    }
 
     @Transactional
     public void deleteUser(Long userId) {
