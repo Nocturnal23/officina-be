@@ -16,7 +16,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -66,14 +65,8 @@ public class Booking extends BaseEntity {
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "booking_services",
-        joinColumns = @JoinColumn(
-            name = "booking_id", 
-            foreignKey = @ForeignKey(foreignKeyDefinition = "FOREIGN KEY (booking_id) REFERENCES bookings ON DELETE CASCADE")
-        ),
-        inverseJoinColumns = @JoinColumn(
-            name = "service_id",
-            foreignKey = @ForeignKey(foreignKeyDefinition = "FOREIGN KEY (service_id) REFERENCES jobs ON DELETE RESTRICT")
-        )
+        joinColumns = @JoinColumn(name = "booking_id"),
+        inverseJoinColumns = @JoinColumn(name = "service_id")
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Jobs> jobs = new HashSet<>();
