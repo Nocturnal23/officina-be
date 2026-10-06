@@ -111,8 +111,7 @@ public class UserService {
             vehicleService.deleteVehicle(veh.getId(), userId);
         }
             
-        user.setDeleted(true);
-        userRepo.save(user);
+        userRepo.delete(user);
     }
 
     @Transactional 
