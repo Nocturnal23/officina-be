@@ -38,7 +38,6 @@ public class UserService {
     private final PasswordEncoder pswEncoder;
     private final JwtService jwtService;
     private final VehicleRepository vehicleRepo;
-    private final VehicleService vehicleService;
 
     @Transactional
     public UserResponse registerUser(UserRequest request) {
@@ -108,11 +107,13 @@ public class UserService {
         List<Vehicle> vehicles = vehicleRepo.findByUser_IdAndDeletedFalse(userId);
 
         for(Vehicle veh: vehicles) {
-            vehicleService.deleteVehicle(veh.getId(), userId);
+            veh.setDeleted(true);
+            veh.setUser(null); 
         }
-            
-        user.setDeleted(true);
-        userRepo.save(user);
+
+        vehicleRepo.saveAll(vehicles);
+
+        userRepo.delete(user);
     }
 
     @Transactional 

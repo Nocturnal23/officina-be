@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.officina.officina_be.core.templates.BaseEntity;
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
 
@@ -53,6 +56,7 @@ public class Booking extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @Column(name = "appointment_date", nullable = false)
@@ -64,5 +68,6 @@ public class Booking extends BaseEntity {
         joinColumns = @JoinColumn(name = "booking_id"),
         inverseJoinColumns = @JoinColumn(name = "service_id")
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Jobs> jobs = new HashSet<>();
 }

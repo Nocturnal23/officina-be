@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import com.officina.officina_be.core.templates.BaseEntity;
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
@@ -61,6 +63,7 @@ public class InterventionHistory extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Booking booking;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
