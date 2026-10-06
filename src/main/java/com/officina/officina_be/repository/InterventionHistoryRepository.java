@@ -18,4 +18,5 @@ public interface InterventionHistoryRepository extends JpaRepository<Interventio
     Page<InterventionHistory> findByVehicle_IdAndStatusInAndDeletedFalse(Long vehicleId, List<BookingStatus> statuses, Pageable pageable);
     Optional<InterventionHistory> findFirstByVehicle_IdOrderByCompletedAtDesc(Long vehicleId);
     Page<InterventionHistory> findByVehicleUserIdAndStatusIn(Long userId, List<BookingStatus> statuses, Pageable pageable);
+    Page<InterventionHistory> findByVehicleUserIdAndVehicleDeletedFalseAndStatusIn(Long userId, List<BookingStatus> statuses, Pageable pageable);
 }

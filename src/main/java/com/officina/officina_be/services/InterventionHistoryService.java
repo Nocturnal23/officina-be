@@ -124,7 +124,7 @@ public class InterventionHistoryService {
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("completedAt").descending());
-        Page<InterventionHistory> interventionPage = interventionHistoryRepo.findByVehicleUserIdAndStatusIn(userId, filterStatuses, pageable);
+        Page<InterventionHistory> interventionPage = interventionHistoryRepo.findByVehicleUserIdAndVehicleDeletedFalseAndStatusIn(userId, filterStatuses, pageable);
 
         return interventionHistoryMapper.toPageResponse(interventionPage);
     }
