@@ -1,5 +1,8 @@
 package com.officina.officina_be.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.officina.officina_be.core.templates.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -43,6 +46,7 @@ public class Vehicle extends BaseEntity {
     private String plate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private User user;
 }
