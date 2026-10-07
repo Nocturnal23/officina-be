@@ -18,6 +18,7 @@ import com.officina.officina_be.dto.request.LoginRequest;
 import com.officina.officina_be.dto.request.UserRequest;
 import com.officina.officina_be.dto.response.LoginResponse;
 import com.officina.officina_be.dto.response.UserResponse;
+import com.officina.officina_be.dto.request.ChangePasswordRequest;
 import com.officina.officina_be.entity.User;
 import com.officina.officina_be.services.UserService;
 
@@ -74,6 +75,12 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal User user) {
         userService.deleteUser(user.getId());
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/users/me/password")
+    public ResponseEntity<Void> changePassword(@AuthenticationPrincipal User user, @Valid @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(request, user.getId());
         return ResponseEntity.noContent().build();
     }
 }
