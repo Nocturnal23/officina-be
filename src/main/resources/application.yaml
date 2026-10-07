@@ -27,9 +27,5 @@ spring:
 
     logging:
         level:
-            root: "warn"
-            org.springframework.web: "debug"
-            org.hibernate: "error"
-
-            application:
-                name: officina-be
+            org.hibernate.engine.jdbc.spi.SqlExceptionHelper: ERROR
+            org.springframework.web: DEBUG
