@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.officina.officina_be.config.JwtService;
 import com.officina.officina_be.core.utils.Constants;
+import com.officina.officina_be.dto.request.ChangePasswordRequest;
 import com.officina.officina_be.dto.request.LoginRequest;
 import com.officina.officina_be.dto.request.UserRequest;
 import com.officina.officina_be.dto.response.LoginResponse;
@@ -139,5 +140,17 @@ public class UserService {
 
 
         return userMapper.toPageResponse(userPage);
+    }
+
+    @Transactional 
+    public void changePassword(ChangePasswordRequest request, Long userId) {
+        User user = userRepo.findByIdAndDeletedFalse(userId).orElseThrow(() -> new ResourceNotFound("Utente " + userId + " non trovato"));
+
+        if (!pswEncoder.matches(request.oldPassword(), user.getPassword())) {
+            throw new Unauthorized("Credenziali non valide");
+        }
+
+        user.setPassword(pswEncoder.encode(request.newPassword()));
+        userRepo.save(user);
     }
 }
