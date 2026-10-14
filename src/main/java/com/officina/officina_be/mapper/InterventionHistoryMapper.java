@@ -17,7 +17,6 @@ import com.officina.officina_be.entity.Jobs;
 public class InterventionHistoryMapper {
     public InterventionHistory toEntity(InterventionHistoryRequest request) {
         InterventionHistory interventionHistory = new InterventionHistory();
-        interventionHistory.setKilometers(request.kilometers());
         interventionHistory.setCost(request.cost());
         interventionHistory.setNotes(request.notes());
         interventionHistory.setCompletedAt(request.completedAt());
@@ -37,7 +36,6 @@ public class InterventionHistoryMapper {
 
         return new InterventionHistoryResponse(
             entity.getId(),
-            entity.getKilometers(),
             safeCost,
             entity.getNotes(),
             entity.getCompletedAt(),

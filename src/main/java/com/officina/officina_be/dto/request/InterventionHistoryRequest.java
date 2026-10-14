@@ -8,8 +8,6 @@ import com.officina.officina_be.core.utils.Constants.BookingStatus;
 import jakarta.validation.constraints.Size;
 
 public record InterventionHistoryRequest( 
-    Long kilometers,
-
     Double cost,
 
     @Size(max = 500, message = "Il messaggio non può eccedere i 500 caratteri!")

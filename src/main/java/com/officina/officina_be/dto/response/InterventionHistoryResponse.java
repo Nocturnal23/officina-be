@@ -7,7 +7,6 @@ import com.officina.officina_be.core.utils.Constants.BookingStatus;
 
 public record InterventionHistoryResponse(
     Long id,
-    Long kilometers,
     Double cost,
     String notes,
     LocalDate completedAt,
