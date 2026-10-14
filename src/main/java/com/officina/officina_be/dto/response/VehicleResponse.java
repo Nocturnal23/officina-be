@@ -5,6 +5,6 @@ public record VehicleResponse(
     String brand,
     String model,
     String plate,
-    int year,
+    Long kilometers,
     Long userId
 ) {}

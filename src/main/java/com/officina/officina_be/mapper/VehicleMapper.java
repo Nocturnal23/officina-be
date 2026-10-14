@@ -12,7 +12,7 @@ public class VehicleMapper {
         Vehicle vehicle = new Vehicle();
         vehicle.setBrand(request.brand());
         vehicle.setModel(request.model());
-        vehicle.setYear(request.year());
+        vehicle.setKilometers(request.kilometers());
         vehicle.setPlate(request.plate().toUpperCase());
         return vehicle;
     }
@@ -23,7 +23,7 @@ public class VehicleMapper {
             entity.getBrand(),
             entity.getModel(),
             entity.getPlate(),
-            entity.getYear(),
+            entity.getKilometers(),
             entity.getUser().getId()
         );
     }
