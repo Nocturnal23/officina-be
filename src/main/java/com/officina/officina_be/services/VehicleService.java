@@ -40,6 +40,7 @@ public class VehicleService {
                     existing.setDeleted(false);
                     existing.setBrand(request.brand());
                     existing.setModel(request.model());
+                    existing.setKilometers(request.kilometers());
 
                     return existing;
                 })

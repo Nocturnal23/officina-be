@@ -2,7 +2,6 @@ package com.officina.officina_be.services;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -20,6 +19,7 @@ import com.officina.officina_be.entity.Booking;
 import com.officina.officina_be.entity.InterventionHistory;
 import com.officina.officina_be.entity.Jobs;
 import com.officina.officina_be.entity.Vehicle;
+import com.officina.officina_be.error.BadRequest;
 import com.officina.officina_be.error.ResourceNotFound;
 import com.officina.officina_be.mapper.InterventionHistoryMapper;
 import com.officina.officina_be.repository.BookingRepository;
@@ -42,13 +42,12 @@ public class InterventionHistoryService {
     private final InterventionHistoryMapper interventionHistoryMapper;
 
     @Transactional
-    public InterventionHistoryResponse saveIntervention(InterventionHistoryRequest request, Long vehicleId) {
-        Vehicle vehicle = vehicleRepo.findByIdAndDeletedFalse(vehicleId)
+    public InterventionHistoryResponse saveIntervention(InterventionHistoryRequest request, Long vehicleId, Long vehicleKilometers) {
+        Vehicle vehicle = vehicleRepo.findByIdAndDeletedFalseForUpdate(vehicleId)
                 .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
 
-        Long lastKm = getLastVehicleKilometers(vehicleId);
-        if (request.kilometers() != null && request.kilometers() < lastKm) {
-            throw new IllegalArgumentException("I chilometri inseriti (" + request.kilometers() + ") sono inferiori a quelli dell'ultimo intervento (" + lastKm + ").");
+        if (vehicleKilometers < vehicle.getKilometers()) {
+            throw new BadRequest("I chilometri inseriti (" + vehicleKilometers + ") sono inferiori a quelli attuali del veicolo (" + vehicle.getKilometers() + ").");
         }
 
         Set<Jobs> jobs = new HashSet<>(
@@ -57,6 +56,7 @@ public class InterventionHistoryService {
         InterventionHistory interventionHistory = interventionHistoryMapper.toEntity(request);
         interventionHistory.setVehicle(vehicle);
         interventionHistory.setJobs(jobs);
+        vehicle.setKilometers(vehicleKilometers);
 
         if (request.bookingId() != null) {
             Booking booking = bookingRepo.findById(request.bookingId())
@@ -65,6 +65,7 @@ public class InterventionHistoryService {
         }
 
         InterventionHistory savedIntervention = interventionHistoryRepo.save(interventionHistory);
+        vehicleRepo.save(vehicle);
 
         return interventionHistoryMapper.toResponse(savedIntervention);
     }
@@ -101,7 +102,6 @@ public class InterventionHistoryService {
         InterventionHistory intervention = interventionHistoryRepo.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFound("Intervento non trovato."));
 
-        intervention.setKilometers(request.kilometers());
         intervention.setCost(request.cost());
         intervention.setNotes(request.notes());
 
@@ -129,14 +129,4 @@ public class InterventionHistoryService {
         return interventionHistoryMapper.toPageResponse(interventionPage);
     }
 
-    @Transactional 
-    public Long getLastVehicleKilometers(Long vehicleId) {
-        Optional<InterventionHistory> lastIntervention = interventionHistoryRepo.findFirstByVehicle_IdOrderByCompletedAtDesc(vehicleId);
-        
-        if (lastIntervention.isPresent() && lastIntervention.get().getKilometers() != null) {
-            return lastIntervention.get().getKilometers();
-        }
-        
-        return 0L;
-    }
 }
