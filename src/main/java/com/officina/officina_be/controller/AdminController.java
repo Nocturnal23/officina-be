@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
-import com.officina.officina_be.dto.request.InterventionCompletionRequest;
 import com.officina.officina_be.dto.request.InterventionHistoryRequest;
 import com.officina.officina_be.dto.request.JobAvailabilityRequest;
 import com.officina.officina_be.dto.request.JobRequest;
@@ -143,12 +142,11 @@ public class AdminController {
     @PostMapping("/vehicles/{vehicleId}/interventions")
 	public ResponseEntity<InterventionHistoryResponse> createIntervention(
 		@PathVariable Long vehicleId,
-		@Valid @RequestBody InterventionCompletionRequest request
+		@Valid @RequestBody InterventionHistoryRequest request
 	) {
 		InterventionHistoryResponse response = interventionHistoryService.saveIntervention(
-			request.intervention(),
-			vehicleId,
-			request.vehicleKilometers()
+			request,
+			vehicleId
 		);
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);

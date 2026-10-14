@@ -54,6 +54,9 @@ public class InterventionHistory extends BaseEntity {
     @Column(name = "completed_at", nullable = false)
     private LocalDate completedAt;
 
+    @Column(name = "intervention_kilometers", nullable = true)
+    private Long interventionKilometers;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = true)
     private Vehicle vehicle;

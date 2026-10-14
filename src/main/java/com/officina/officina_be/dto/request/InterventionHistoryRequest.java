@@ -5,6 +5,8 @@ import java.util.Set;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 public record InterventionHistoryRequest( 
@@ -14,6 +16,10 @@ public record InterventionHistoryRequest(
     String notes,
 
     LocalDate completedAt,
+
+    @NotNull(message = "Devi inserire il chilometraggio attuale")
+    @PositiveOrZero(message = "Il chilometraggio non può essere negativo")
+    Long interventionKilometers,
 
     Set<Long> jobsIds,
 

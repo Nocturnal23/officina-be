@@ -20,6 +20,7 @@ public class InterventionHistoryMapper {
         interventionHistory.setCost(request.cost());
         interventionHistory.setNotes(request.notes());
         interventionHistory.setCompletedAt(request.completedAt());
+        interventionHistory.setInterventionKilometers(request.interventionKilometers());
         interventionHistory.setStatus(request.status());
 
         return interventionHistory;
@@ -39,6 +40,7 @@ public class InterventionHistoryMapper {
             safeCost,
             entity.getNotes(),
             entity.getCompletedAt(),
+            entity.getInterventionKilometers(),
             entity.getVehicle().getId(),
             safeBookingId,
             jobsIds,
