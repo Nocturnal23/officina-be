@@ -10,6 +10,7 @@ public record InterventionHistoryResponse(
     Double cost,
     String notes,
     LocalDate completedAt,
+    Long interventionKilometers,
     Long vehicleId,
     Long bookingId,
     Set<Long> jobsIds,

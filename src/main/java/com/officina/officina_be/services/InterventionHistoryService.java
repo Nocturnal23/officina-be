@@ -42,12 +42,13 @@ public class InterventionHistoryService {
     private final InterventionHistoryMapper interventionHistoryMapper;
 
     @Transactional
-    public InterventionHistoryResponse saveIntervention(InterventionHistoryRequest request, Long vehicleId, Long vehicleKilometers) {
+    public InterventionHistoryResponse saveIntervention(InterventionHistoryRequest request, Long vehicleId) {
         Vehicle vehicle = vehicleRepo.findByIdAndDeletedFalseForUpdate(vehicleId)
                 .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
 
-        if (vehicleKilometers < vehicle.getKilometers()) {
-            throw new BadRequest("I chilometri inseriti (" + vehicleKilometers + ") sono inferiori a quelli attuali del veicolo (" + vehicle.getKilometers() + ").");
+        Long interventionKilometers = request.interventionKilometers();
+        if (interventionKilometers < vehicle.getKilometers()) {
+            throw new BadRequest("I chilometri inseriti (" + interventionKilometers + ") sono inferiori a quelli attuali del veicolo (" + vehicle.getKilometers() + ").");
         }
 
         Set<Jobs> jobs = new HashSet<>(
@@ -56,7 +57,7 @@ public class InterventionHistoryService {
         InterventionHistory interventionHistory = interventionHistoryMapper.toEntity(request);
         interventionHistory.setVehicle(vehicle);
         interventionHistory.setJobs(jobs);
-        vehicle.setKilometers(vehicleKilometers);
+        vehicle.setKilometers(interventionKilometers);
 
         if (request.bookingId() != null) {
             Booking booking = bookingRepo.findById(request.bookingId())
