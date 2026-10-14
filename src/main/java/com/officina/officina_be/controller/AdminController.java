@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
+import com.officina.officina_be.dto.request.InterventionCompletionRequest;
 import com.officina.officina_be.dto.request.InterventionHistoryRequest;
 import com.officina.officina_be.dto.request.JobAvailabilityRequest;
 import com.officina.officina_be.dto.request.JobRequest;
@@ -142,11 +143,12 @@ public class AdminController {
     @PostMapping("/vehicles/{vehicleId}/interventions")
 	public ResponseEntity<InterventionHistoryResponse> createIntervention(
 		@PathVariable Long vehicleId,
-		@Valid @RequestBody InterventionHistoryRequest request
+		@Valid @RequestBody InterventionCompletionRequest request
 	) {
 		InterventionHistoryResponse response = interventionHistoryService.saveIntervention(
-			request,
-			vehicleId
+			request.intervention(),
+			vehicleId,
+			request.vehicleKilometers()
 		);
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -164,11 +166,5 @@ public class AdminController {
     public ResponseEntity<Void> deleteIntervention(@PathVariable Long id) {
         interventionHistoryService.deleteIntervention(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/vehicles/{vehicleId}/kilometers")
-    public ResponseEntity<Long> getLastVehicleKilometers(@PathVariable Long vehicleId) {
-        Long lastKm = interventionHistoryService.getLastVehicleKilometers(vehicleId);
-        return ResponseEntity.ok(lastKm);
     }
 }
