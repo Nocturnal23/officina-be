@@ -12,6 +12,20 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class GlobalErrorHandling {
+    @ExceptionHandler(BadRequest.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(
+            BadRequest ex,
+            HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Bad Request",
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(ResourceNotFound.class)
     public ResponseEntity<ErrorResponse> handleNotFound(
         ResourceNotFound ex, 
