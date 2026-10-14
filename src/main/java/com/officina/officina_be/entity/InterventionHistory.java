@@ -44,9 +44,6 @@ public class InterventionHistory extends BaseEntity {
     @Column(name = "intervention_history_id", nullable = false, unique = true)
     private Long id;
     
-    @Column(name = "kilometers", nullable = true)
-    private Long kilometers;
-
     @Column(name = "cost", nullable = true)
     private Double cost;
 
