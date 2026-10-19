@@ -23,6 +23,9 @@ public class BookingFilterRequest {
     private String vehicleModel;
     private String vehiclePlate;
 
+    @Positive
+    private Long vehicleId;
+
     private List<@Positive Long> jobIds;
 
     @AssertTrue(message = "I parametri della data non corrispondono alla modalità selezionata.")
