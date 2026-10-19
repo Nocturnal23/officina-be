@@ -19,8 +19,10 @@ import com.officina.officina_be.dto.request.BookingFilterRequest;
 import com.officina.officina_be.dto.request.BookingRequest;
 import com.officina.officina_be.dto.response.BookingResponse;
 import com.officina.officina_be.dto.response.PageResponse;
+import com.officina.officina_be.dto.response.VehicleResponse;
 import com.officina.officina_be.entity.User;
 import com.officina.officina_be.services.BookingService;
+import com.officina.officina_be.services.VehicleService;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
@@ -31,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/users/me")
 public class BookingController {
     private final BookingService bookingService;
+    private final VehicleService vehicleService;
 
     @PostMapping("/vehicles/{vehicleId}/bookings")
 	public ResponseEntity<BookingResponse> createBooking(
@@ -78,6 +81,16 @@ public class BookingController {
 	) {
 		return ResponseEntity.ok(
 			bookingService.getBookingHistoryByUserId(user.getId(), page, size, statuses, filters)
+		);
+	}
+
+	@GetMapping("/history/vehicle")
+	public ResponseEntity<List<VehicleResponse>> searchVehiclesForHistory(
+		@AuthenticationPrincipal User user,
+		@RequestParam String query
+	) {
+		return ResponseEntity.ok(
+			vehicleService.searchVehiclesForUserHistory(user.getId(), query)
 		);
 	}
 }
