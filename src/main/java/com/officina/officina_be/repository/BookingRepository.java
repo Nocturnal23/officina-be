@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +14,7 @@ import com.officina.officina_be.core.utils.Constants.BookingStatus;
 import com.officina.officina_be.entity.Booking;
 
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, Long> {
+public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpecificationExecutor<Booking> {
     List<Booking> findByVehicle_IdAndDeletedFalse(Long vehicleId); //Insieme di prenotazioni sul veicolo.
     Page<Booking> findByUser_IdAndDeletedFalse(Long userId, Pageable pageable); //Insieme di prenotazioni dal cliente.
     Optional<Booking> findByIdAndDeletedFalse(Long bookingId); //Ottiene una singola prenotazione.
