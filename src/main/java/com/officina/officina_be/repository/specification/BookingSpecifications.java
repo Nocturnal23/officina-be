@@ -23,8 +23,9 @@ public final class BookingSpecifications {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.isFalse(root.get("deleted")));
-            predicates.add(root.get("status").in(statuses));
-
+            if (statuses != null && !statuses.isEmpty()) {
+                predicates.add(root.get("status").in(statuses));
+            }
 
             if (userId != null) {
                 predicates.add(criteriaBuilder.equal(root.get("user").get("id"), userId));
@@ -62,6 +63,11 @@ public final class BookingSpecifications {
                     predicates.add(criteriaBuilder.equal(
                             criteriaBuilder.upper(root.join("vehicle", JoinType.INNER).get("plate")),
                             filters.getVehiclePlate().trim().toUpperCase()));
+                }
+                if (filters.getVehicleId() != null) {
+                    predicates.add(criteriaBuilder.equal(
+                            root.join("vehicle", JoinType.INNER).get("id"),
+                            filters.getVehicleId()));
                 }
                 if (filters.getJobIds() != null && !filters.getJobIds().isEmpty()) {
                     predicates.add(root.join("jobs", JoinType.INNER)
