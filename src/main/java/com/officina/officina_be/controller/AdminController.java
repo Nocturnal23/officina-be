@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
+import com.officina.officina_be.dto.request.BookingFilterRequest;
 import com.officina.officina_be.dto.request.InterventionHistoryRequest;
 import com.officina.officina_be.dto.request.JobAvailabilityRequest;
 import com.officina.officina_be.dto.request.JobRequest;
@@ -56,6 +58,13 @@ public class AdminController {
     }
 
     /*VEHICLE*/
+
+    @GetMapping("/vehicles")
+    public ResponseEntity<List<VehicleResponse>> getAllVehicles(
+        @RequestParam(required = false) String plate
+    ) {
+        return ResponseEntity.ok(vehicleService.getAllVehicles(plate));
+    }
 
     @GetMapping("vehicles/{vehicleId}")
     public ResponseEntity<VehicleResponse> getVehicleById(@PathVariable Long vehicleId) {
@@ -106,9 +115,10 @@ public class AdminController {
     public ResponseEntity<PageResponse<BookingResponse>> getAllBookings(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
-        @RequestParam(required = false) List<BookingStatus> statuses
+        @RequestParam(required = false) List<BookingStatus> statuses,
+        @Valid @ModelAttribute BookingFilterRequest filters
     ) {
-        return ResponseEntity.ok(bookingService.getAllBookings(page, size, statuses));
+        return ResponseEntity.ok(bookingService.getAllBookings(page, size, statuses, filters));
     }
 
     @GetMapping("/users/{userId}")
