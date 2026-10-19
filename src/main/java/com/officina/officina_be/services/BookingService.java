@@ -106,15 +106,15 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<BookingResponse> getAllBookings(int page, int size, List<BookingStatus> statuses) {
+    public PageResponse<BookingResponse> getAllBookings(
+            int page,
+            int size,
+            List<BookingStatus> statuses,
+            BookingFilterRequest filters) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
-
-        Page<Booking> bookingPage;
-        if (statuses == null || statuses.isEmpty()) {
-            bookingPage = bookingRepo.findByDeletedFalse(pageable);
-        } else {
-            bookingPage = bookingRepo.findByStatusInAndDeletedFalse(statuses, pageable);
-        }
+        Page<Booking> bookingPage = bookingRepo.findAll(
+                BookingSpecifications.history(null, statuses, filters),
+                pageable);
 
         return bookingMapper.toPageResponse(bookingPage);
     }
