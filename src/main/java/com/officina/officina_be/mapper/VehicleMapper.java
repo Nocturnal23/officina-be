@@ -24,7 +24,7 @@ public class VehicleMapper {
             entity.getModel(),
             entity.getPlate(),
             entity.getKilometers(),
-            entity.getUser().getId()
+            entity.getUser() == null ? null : entity.getUser().getId()
         );
     }
 }
