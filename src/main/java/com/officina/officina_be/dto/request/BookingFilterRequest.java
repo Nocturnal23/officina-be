@@ -23,7 +23,6 @@ public class BookingFilterRequest {
     private String vehicleModel;
     private String vehiclePlate;
 
-    @Positive
     private Long vehicleId;
 
     private List<@Positive Long> jobIds;
