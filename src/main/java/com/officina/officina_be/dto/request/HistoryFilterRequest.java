@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BookingFilterRequest {
+public class HistoryFilterRequest {
     @Pattern(regexp = "range|on|before|after", message = "Modalità data non valida.")
     private String dateMode;
 
@@ -23,6 +23,7 @@ public class BookingFilterRequest {
     private String vehicleModel;
     private String vehiclePlate;
 
+    @Positive
     private Long vehicleId;
 
     private List<@Positive Long> jobIds;
