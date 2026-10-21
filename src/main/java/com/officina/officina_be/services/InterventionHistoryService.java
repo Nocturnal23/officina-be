@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
+import com.officina.officina_be.dto.request.HistoryFilterRequest;
 import com.officina.officina_be.dto.request.InterventionHistoryRequest;
 import com.officina.officina_be.dto.response.InterventionHistoryResponse;
 import com.officina.officina_be.dto.response.PageResponse;
@@ -27,6 +28,7 @@ import com.officina.officina_be.repository.InterventionHistoryRepository;
 import com.officina.officina_be.repository.JobsRepository;
 import com.officina.officina_be.repository.UserRepository;
 import com.officina.officina_be.repository.VehicleRepository;
+import com.officina.officina_be.repository.specification.InterventionSpecifications;
 
 import lombok.RequiredArgsConstructor;
 
@@ -116,7 +118,12 @@ public class InterventionHistoryService {
     }
 
     @Transactional
-    public PageResponse<InterventionHistoryResponse> getInterventionsHistoryByUserId(Long userId, int page, int size, List<BookingStatus> filterStatuses) {
+    public PageResponse<InterventionHistoryResponse> getInterventionsHistoryByUserId(
+            Long userId,
+            int page,
+            int size,
+            List<BookingStatus> filterStatuses,
+            HistoryFilterRequest filters) {
         userRepo.findByIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
 
@@ -125,7 +132,9 @@ public class InterventionHistoryService {
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("completedAt").descending());
-        Page<InterventionHistory> interventionPage = interventionHistoryRepo.findByVehicleUserIdAndVehicleDeletedFalseAndStatusIn(userId, filterStatuses, pageable);
+        Page<InterventionHistory> interventionPage = interventionHistoryRepo.findAll(
+                InterventionSpecifications.history(userId, filterStatuses, filters),
+                pageable);
 
         return interventionHistoryMapper.toPageResponse(interventionPage);
     }
