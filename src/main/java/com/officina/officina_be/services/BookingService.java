@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
-import com.officina.officina_be.dto.request.BookingFilterRequest;
+import com.officina.officina_be.dto.request.HistoryFilterRequest;
 import com.officina.officina_be.dto.request.BookingRequest;
 import com.officina.officina_be.dto.response.BookingResponse;
 import com.officina.officina_be.dto.response.PageResponse;
@@ -110,7 +110,7 @@ public class BookingService {
             int page,
             int size,
             List<BookingStatus> statuses,
-            BookingFilterRequest filters) {
+            HistoryFilterRequest filters) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
         Page<Booking> bookingPage = bookingRepo.findAll(
                 BookingSpecifications.history(null, statuses, filters),
@@ -141,7 +141,7 @@ public class BookingService {
 
     @Transactional
     public PageResponse<BookingResponse> getBookingHistoryByUserId(Long userId, int page, int size,
-            List<BookingStatus> filterStatuses, BookingFilterRequest filters) {
+            List<BookingStatus> filterStatuses, HistoryFilterRequest filters) {
         userRepo.findByIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
 

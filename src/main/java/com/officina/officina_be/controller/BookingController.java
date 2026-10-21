@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
-import com.officina.officina_be.dto.request.BookingFilterRequest;
+import com.officina.officina_be.dto.request.HistoryFilterRequest;
 import com.officina.officina_be.dto.request.BookingRequest;
 import com.officina.officina_be.dto.response.BookingResponse;
 import com.officina.officina_be.dto.response.PageResponse;
@@ -77,7 +77,7 @@ public class BookingController {
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size,
 		@RequestParam(required = false) List<BookingStatus> statuses,
-		@Valid @ModelAttribute BookingFilterRequest filters
+		@Valid @ModelAttribute HistoryFilterRequest filters
 	) {
 		return ResponseEntity.ok(
 			bookingService.getBookingHistoryByUserId(user.getId(), page, size, statuses, filters)

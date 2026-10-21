@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.officina.officina_be.core.utils.Constants.BookingStatus;
-import com.officina.officina_be.dto.request.BookingFilterRequest;
+import com.officina.officina_be.dto.request.HistoryFilterRequest;
 import com.officina.officina_be.entity.Booking;
 
 import jakarta.persistence.criteria.JoinType;
@@ -19,7 +19,7 @@ public final class BookingSpecifications {
     public static Specification<Booking> history(
             Long userId,
             List<BookingStatus> statuses,
-            BookingFilterRequest filters) {
+            HistoryFilterRequest filters) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.isFalse(root.get("deleted")));
