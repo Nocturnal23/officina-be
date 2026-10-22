@@ -30,4 +30,9 @@ public class JobController {
     public ResponseEntity<List<JobResponse>> getAvailableJobs() {
         return ResponseEntity.ok(jobService.getAllJobs());
     }
+
+    @GetMapping("/jobs/history-options")
+    public ResponseEntity<List<JobResponse>> getHistoryJobs() {
+        return ResponseEntity.ok(jobService.getAllJobsIncludingDisabled());
+    }
 }
