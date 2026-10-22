@@ -76,8 +76,8 @@ public class JobService {
         return jobMapper.toResponse(job);
     }
 
-    @Transactional 
-    public List<JobResponse> getAllJobsForAdmin() {
+    @Transactional(readOnly = true)
+    public List<JobResponse> getAllJobsIncludingDisabled() {
         return jobsRepo.findAll()
             .stream()
             .map(jobMapper::toResponse)
