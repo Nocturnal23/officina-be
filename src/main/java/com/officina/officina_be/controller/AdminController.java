@@ -99,7 +99,7 @@ public class AdminController {
 
     @GetMapping("/jobs")
     public ResponseEntity<List<JobResponse>> getAdminJobs() {
-        return ResponseEntity.ok(jobService.getAllJobsForAdmin());
+        return ResponseEntity.ok(jobService.getAllJobsIncludingDisabled());
     }
 
     @PatchMapping("/jobs/{jobId}/availability")
