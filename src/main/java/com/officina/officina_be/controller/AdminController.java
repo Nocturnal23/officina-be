@@ -175,4 +175,14 @@ public class AdminController {
         interventionHistoryService.deleteIntervention(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/interventions")
+        public ResponseEntity<PageResponse<InterventionHistoryResponse>> getAllIntervention(
+           @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) List<BookingStatus> statuses,
+            @Valid @ModelAttribute HistoryFilterRequest filters 
+        ) {
+            return ResponseEntity.ok(interventionHistoryService.getAllIntervention(page, size, statuses, filters));
+        }
 }
