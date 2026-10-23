@@ -76,6 +76,11 @@ public final class InterventionSpecifications {
                             .get("id").in(filters.getJobIds()));
                     query.distinct(true);
                 }
+                if (filters.getUserId() != null && userId == null) {
+                    predicates.add(criteriaBuilder.equal(
+                        vehicle.get("user").get("id"), filters.getUserId()));
+                    predicates.add(criteriaBuilder.isFalse(vehicle.get("deleted")));
+                }
             }
 
             return criteriaBuilder.and(predicates.toArray(Predicate[]::new));

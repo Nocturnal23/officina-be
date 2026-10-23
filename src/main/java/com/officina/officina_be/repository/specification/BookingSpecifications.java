@@ -74,6 +74,11 @@ public final class BookingSpecifications {
                             .get("id").in(filters.getJobIds()));
                     query.distinct(true);
                 }
+                if (userId == null && filters.getUserId() != null) {
+                    predicates.add(criteriaBuilder.equal(
+                            root.get("user").get("id"),
+                            filters.getUserId()));
+                }
             }
 
             return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
