@@ -26,6 +26,9 @@ public class HistoryFilterRequest {
     @Positive
     private Long vehicleId;
 
+    @Positive
+    private Long userId;
+    
     private List<@Positive Long> jobIds;
 
     @AssertTrue(message = "I parametri della data non corrispondono alla modalità selezionata.")
