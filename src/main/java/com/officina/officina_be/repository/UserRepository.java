@@ -16,16 +16,21 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailIgnoreCase(String email);
 
     Optional<User> findByEmailIgnoreCaseAndDeletedFalse(String email);
-    
+
     boolean existsByEmailIgnoreCase(String email);
 
     Optional<User> findByIdAndDeletedFalse(Long userId);
 
+    @Query("""
+            SELECT u FROM User u
+            WHERE u.deleted = false
+              AND u.role <> com.officina.officina_be.core.utils.Constants.Role.ADMIN
+            """)
     Page<User> findByDeletedFalse(Pageable pageable);
 
-    @Query("SELECT u FROM User u WHERE u.deleted = false AND " +
-           "(LOWER(u.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    @Query("SELECT u FROM User u WHERE u.deleted = false AND u.role <> com.officina.officina_be.core.utils.Constants.Role.ADMIN AND" +
+            "(LOWER(u.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<User> searchUsers(@Param("keyword") String keyword, Pageable pageable);
 }
