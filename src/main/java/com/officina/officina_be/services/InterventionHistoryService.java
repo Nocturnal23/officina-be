@@ -139,4 +139,17 @@ public class InterventionHistoryService {
         return interventionHistoryMapper.toPageResponse(interventionPage);
     }
 
+    @Transactional(readOnly = true)
+    public PageResponse<InterventionHistoryResponse> getAllIntervention(
+        int page,
+        int size,
+        List<BookingStatus> statuses,
+        HistoryFilterRequest filters) {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("completedAt").descending());
+            Page<InterventionHistory> interventionPage = interventionHistoryRepo.findAll(
+                InterventionSpecifications.history(null, statuses, filters),
+                pageable
+            );
+            return interventionHistoryMapper.toPageResponse(interventionPage);
+        }
 }
