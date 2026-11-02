@@ -66,6 +66,11 @@ public class AdminController {
         return ResponseEntity.ok(vehicleService.getAllVehicles(plate));
     }
 
+    @GetMapping("vehicles/users/{userId}")
+    public ResponseEntity<List<VehicleResponse>> getVehiclesByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(vehicleService.getVehiclesByUserId(userId));
+    }
+
     @GetMapping("vehicles/{vehicleId}")
     public ResponseEntity<VehicleResponse> getVehicleById(@PathVariable Long vehicleId) {
         return ResponseEntity.ok(vehicleService.getVehicleById(vehicleId));
