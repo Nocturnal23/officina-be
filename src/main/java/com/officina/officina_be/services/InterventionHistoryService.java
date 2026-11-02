@@ -59,6 +59,9 @@ public class InterventionHistoryService {
         InterventionHistory interventionHistory = interventionHistoryMapper.toEntity(request);
         interventionHistory.setVehicle(vehicle);
         interventionHistory.setJobs(jobs);
+        if (request.bookingId() == null) {
+            interventionHistory.setStatus(BookingStatus.COMPLETED);
+        }
         vehicle.setKilometers(interventionKilometers);
 
         if (request.bookingId() != null) {
