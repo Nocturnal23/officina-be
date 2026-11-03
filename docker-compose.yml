@@ -5,10 +5,10 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: officina_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ${DB_USER:?Imposta DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Imposta DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
