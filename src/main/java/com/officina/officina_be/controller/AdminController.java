@@ -36,8 +36,8 @@ import com.officina.officina_be.services.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@RestController 
-@RequiredArgsConstructor 
+@RestController
+@RequiredArgsConstructor
 @RequestMapping("api/admin")
 public class AdminController {
     private final VehicleService vehicleService;
@@ -46,23 +46,21 @@ public class AdminController {
     private final UserService userService;
     private final InterventionHistoryService interventionHistoryService;
 
-    /*USER*/
-    
+    /* USER */
+
     @GetMapping("/users")
     public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(required = false) String query
-    ) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String query) {
         return ResponseEntity.ok(userService.getAllUsers(page, size, query));
     }
 
-    /*VEHICLE*/
+    /* VEHICLE */
 
     @GetMapping("/vehicles")
     public ResponseEntity<List<VehicleResponse>> getAllVehicles(
-        @RequestParam(required = false) String plate
-    ) {
+            @RequestParam(required = false) String plate) {
         return ResponseEntity.ok(vehicleService.getAllVehicles(plate));
     }
 
@@ -71,29 +69,40 @@ public class AdminController {
         return ResponseEntity.ok(vehicleService.getVehiclesByUserId(userId));
     }
 
+    @GetMapping("/users/{userId}/booking-vehicles")
+    public ResponseEntity<List<VehicleResponse>> getVehiclesBookedByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(vehicleService.getVehiclesBookedByUser(userId));
+    }
+
+    @GetMapping("/vehicles/{vehicleId}/booking-users")
+    public ResponseEntity<PageResponse<UserResponse>> getUsersWithBookingsForVehicle(
+            @PathVariable Long vehicleId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String query) {
+        return ResponseEntity.ok(userService.getUsersWithBookingsForVehicle(vehicleId, page, size, query));
+    }
+
     @GetMapping("vehicles/{vehicleId}")
     public ResponseEntity<VehicleResponse> getVehicleById(@PathVariable Long vehicleId) {
         return ResponseEntity.ok(vehicleService.getVehicleById(vehicleId));
     }
 
-    /*JOB*/
+    /* JOB */
 
     @PostMapping("/jobs")
     public ResponseEntity<JobResponse> registerJob(
-        @Valid @RequestBody JobRequest request
-    ) {
+            @Valid @RequestBody JobRequest request) {
         JobResponse response = jobService.registerService(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/jobs/{jobId}")
     public ResponseEntity<JobResponse> updateJob(
-        @PathVariable Long jobId,
-        @RequestBody Map<String, Object> updates
-    ) {
+            @PathVariable Long jobId,
+            @RequestBody Map<String, Object> updates) {
         return ResponseEntity.ok(
-            jobService.updateJob(jobId, updates)
-        );
+                jobService.updateJob(jobId, updates));
     }
 
     @DeleteMapping("/jobs/{jobId}")
@@ -108,21 +117,20 @@ public class AdminController {
     }
 
     @PatchMapping("/jobs/{jobId}/availability")
-    public ResponseEntity<JobResponse> updateAvailability(@PathVariable Long jobId, @RequestBody JobAvailabilityRequest request) {
+    public ResponseEntity<JobResponse> updateAvailability(@PathVariable Long jobId,
+            @RequestBody JobAvailabilityRequest request) {
         return ResponseEntity.ok(
-            jobService.updateAvailability(jobId, request)
-        );
+                jobService.updateAvailability(jobId, request));
     }
 
-    /*BOOKING*/
+    /* BOOKING */
 
     @GetMapping("/bookings")
     public ResponseEntity<PageResponse<BookingResponse>> getAllBookings(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(required = false) List<BookingStatus> statuses,
-        @Valid @ModelAttribute HistoryFilterRequest filters
-    ) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) List<BookingStatus> statuses,
+            @Valid @ModelAttribute HistoryFilterRequest filters) {
         return ResponseEntity.ok(bookingService.getAllBookings(page, size, statuses, filters));
     }
 
@@ -133,45 +141,40 @@ public class AdminController {
 
     @PatchMapping("/bookings/{bookingId}/status")
     public ResponseEntity<BookingResponse> updateBookingStatus(
-        @PathVariable Long bookingId,
-        @RequestParam BookingStatus status
-    ) {
+            @PathVariable Long bookingId,
+            @RequestParam BookingStatus status) {
         return ResponseEntity.ok(bookingService.updateStatus(bookingId, status));
     }
 
     @DeleteMapping("/bookings/{bookingId}")
-	public ResponseEntity<Void> deleteBooking(
-		@PathVariable Long bookingId
-	) {
-		bookingService.AdminDeleteBooking(bookingId);
-		return ResponseEntity.noContent().build();
-	}
+    public ResponseEntity<Void> deleteBooking(
+            @PathVariable Long bookingId) {
+        bookingService.AdminDeleteBooking(bookingId);
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/bookings/summary")
     public ResponseEntity<Map<BookingStatus, Long>> getBookingSummary() {
         return ResponseEntity.ok(bookingService.getBookingStatusSummary());
     }
 
-    /*INTERVENTION*/
+    /* INTERVENTION */
 
     @PostMapping("/vehicles/{vehicleId}/interventions")
-	public ResponseEntity<InterventionHistoryResponse> createIntervention(
-		@PathVariable Long vehicleId,
-		@Valid @RequestBody InterventionHistoryRequest request
-	) {
-		InterventionHistoryResponse response = interventionHistoryService.saveIntervention(
-			request,
-			vehicleId
-		);
+    public ResponseEntity<InterventionHistoryResponse> createIntervention(
+            @PathVariable Long vehicleId,
+            @Valid @RequestBody InterventionHistoryRequest request) {
+        InterventionHistoryResponse response = interventionHistoryService.saveIntervention(
+                request,
+                vehicleId);
 
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
-	}
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
     @PatchMapping("/interventions/{id}")
     public ResponseEntity<InterventionHistoryResponse> updateIntervention(
-        @PathVariable Long id,
-        @Valid @RequestBody InterventionHistoryRequest request
-    ) {
+            @PathVariable Long id,
+            @Valid @RequestBody InterventionHistoryRequest request) {
         return ResponseEntity.ok(interventionHistoryService.updateIntervention(id, request));
     }
 
@@ -182,12 +185,11 @@ public class AdminController {
     }
 
     @GetMapping("/interventions")
-        public ResponseEntity<PageResponse<InterventionHistoryResponse>> getAllIntervention(
-           @RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<PageResponse<InterventionHistoryResponse>> getAllIntervention(
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) List<BookingStatus> statuses,
-            @Valid @ModelAttribute HistoryFilterRequest filters 
-        ) {
-            return ResponseEntity.ok(interventionHistoryService.getAllIntervention(page, size, statuses, filters));
-        }
+            @Valid @ModelAttribute HistoryFilterRequest filters) {
+        return ResponseEntity.ok(interventionHistoryService.getAllIntervention(page, size, statuses, filters));
+    }
 }
