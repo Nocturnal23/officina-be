@@ -14,6 +14,7 @@ import com.officina.officina_be.error.BadRequest;
 import com.officina.officina_be.error.DuplicateResource;
 import com.officina.officina_be.error.ResourceNotFound;
 import com.officina.officina_be.mapper.VehicleMapper;
+import com.officina.officina_be.repository.BookingRepository;
 import com.officina.officina_be.repository.UserRepository;
 import com.officina.officina_be.repository.VehicleRepository;
 import com.officina.officina_be.repository.specification.VehicleSpecifications;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Sort;
 public class VehicleService {
     private final VehicleRepository vehicleRepo;
     private final UserRepository userRepo;
+    private final BookingRepository bookingRepo;
     private final VehicleMapper vehicleMapper;
 
     @Transactional
@@ -65,6 +67,17 @@ public class VehicleService {
         }
 
         return vehicleRepo.findByUser_IdAndDeletedFalse(userId)
+                .stream()
+                .map(vehicleMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<VehicleResponse> getVehiclesBookedByUser(Long userId) {
+        userRepo.findByIdAndDeletedFalse(userId)
+                .orElseThrow(() -> new ResourceNotFound("Utente con ID " + userId + " non trovato."));
+
+        return bookingRepo.findVehiclesBookedByUser(userId)
                 .stream()
                 .map(vehicleMapper::toResponse)
                 .toList();

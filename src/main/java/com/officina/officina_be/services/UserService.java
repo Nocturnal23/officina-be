@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.officina.officina_be.config.JwtService;
 import com.officina.officina_be.core.utils.Constants;
+import com.officina.officina_be.core.utils.Constants.Role;
 import com.officina.officina_be.dto.request.ChangePasswordRequest;
 import com.officina.officina_be.dto.request.LoginRequest;
 import com.officina.officina_be.dto.request.UserRequest;
@@ -27,7 +28,7 @@ import com.officina.officina_be.mapper.UserMapper;
 import com.officina.officina_be.repository.UserRepository;
 import com.officina.officina_be.repository.VehicleRepository;
 import com.officina.officina_be.dto.response.PageResponse;
-
+import com.officina.officina_be.repository.BookingRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepo;
+    private final BookingRepository bookingRepo;
     private final UserMapper userMapper;
     private final PasswordEncoder pswEncoder;
     private final JwtService jwtService;
@@ -42,7 +44,7 @@ public class UserService {
 
     @Transactional
     public UserResponse registerUser(UserRequest request) {
-        if(userRepo.existsByEmailIgnoreCase(request.email())) {
+        if (userRepo.existsByEmailIgnoreCase(request.email())) {
             throw new DuplicateResource("L'indirizzo email è già presente nel sistema.");
         }
 
@@ -56,7 +58,8 @@ public class UserService {
 
     @Transactional
     public LoginResponse loginUser(LoginRequest request) {
-        User user = userRepo.findByEmailIgnoreCaseAndDeletedFalse(request.email()).orElseThrow(() -> new Unauthorized("Credenziali errate"));
+        User user = userRepo.findByEmailIgnoreCaseAndDeletedFalse(request.email())
+                .orElseThrow(() -> new Unauthorized("Credenziali errate"));
 
         if (!pswEncoder.matches(request.password(), user.getPassword())) {
             throw new Unauthorized("Credenziali non valide");
@@ -70,7 +73,8 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponse getUserByID(Long id) {
-        User user = userRepo.findByIdAndDeletedFalse(id).orElseThrow(() -> new ResourceNotFound("Utente " + id + " non trovato"));
+        User user = userRepo.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFound("Utente " + id + " non trovato"));
 
         return userMapper.toResponse(user);
     }
@@ -78,7 +82,7 @@ public class UserService {
     @Transactional
     public UserResponse updateUser(Long id, Map<String, Object> updates) {
         User user = userRepo.findByIdAndDeletedFalse(id)
-            .orElseThrow(() -> new ResourceNotFound("Utente " + id + " non trovato"));
+                .orElseThrow(() -> new ResourceNotFound("Utente " + id + " non trovato"));
 
         if (updates.containsKey("firstName")) {
             user.setFirstName((String) updates.get("firstName"));
@@ -100,25 +104,25 @@ public class UserService {
     @Transactional
     public User findByEmail(String email) {
         return userRepo.findByEmailIgnoreCaseAndDeletedFalse(email)
-            .orElseThrow(() -> new ResourceNotFound("Utente non trovato"));
+                .orElseThrow(() -> new ResourceNotFound("Utente non trovato"));
     }
-    
-    @Transactional 
+
+    @Transactional
     public User findById(Long id) {
         return userRepo.findByIdAndDeletedFalse(id)
-            .orElseThrow(() -> new ResourceNotFound("Utente non trovato"));
+                .orElseThrow(() -> new ResourceNotFound("Utente non trovato"));
     }
 
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepo.findByIdAndDeletedFalse(userId)
-            .orElseThrow(() -> new ResourceNotFound("Utente non trovato") );
+                .orElseThrow(() -> new ResourceNotFound("Utente non trovato"));
 
         List<Vehicle> vehicles = vehicleRepo.findByUser_IdAndDeletedFalse(userId);
 
-        for(Vehicle veh: vehicles) {
+        for (Vehicle veh : vehicles) {
             veh.setDeleted(true);
-            veh.setUser(null); 
+            veh.setUser(null);
         }
 
         vehicleRepo.saveAll(vehicles);
@@ -126,7 +130,7 @@ public class UserService {
         userRepo.delete(user);
     }
 
-    @Transactional 
+    @Transactional
     public PageResponse<UserResponse> getAllUsers(int page, int size, String keyword) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("lastName").descending());
 
@@ -138,13 +142,33 @@ public class UserService {
             userPage = userRepo.findByDeletedFalse(pageable);
         }
 
+        return userMapper.toPageResponse(userPage);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<UserResponse> getUsersWithBookingsForVehicle(
+            Long vehicleId,
+            int page,
+            int size,
+            String keyword) {
+        vehicleRepo.findById(vehicleId)
+                .orElseThrow(() -> new ResourceNotFound("Veicolo con ID " + vehicleId + " non trovato."));
+
+        Pageable pageable = PageRequest.of(page, size);
+        String normalizedKeyword = keyword == null || keyword.isBlank() ? "" : keyword.trim();
+        Page<User> userPage = bookingRepo.findUsersWithBookingsForVehicle(
+                vehicleId,
+                Role.USER,
+                normalizedKeyword,
+                pageable);
 
         return userMapper.toPageResponse(userPage);
     }
 
-    @Transactional 
+    @Transactional
     public void changePassword(ChangePasswordRequest request, Long userId) {
-        User user = userRepo.findByIdAndDeletedFalse(userId).orElseThrow(() -> new ResourceNotFound("Utente " + userId + " non trovato"));
+        User user = userRepo.findByIdAndDeletedFalse(userId)
+                .orElseThrow(() -> new ResourceNotFound("Utente " + userId + " non trovato"));
 
         if (!pswEncoder.matches(request.oldPassword(), user.getPassword())) {
             throw new Unauthorized("Credenziali non valide");
