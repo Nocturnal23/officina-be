@@ -48,6 +48,32 @@ public class InterventionHistoryService {
         Vehicle vehicle = vehicleRepo.findByIdAndDeletedFalseForUpdate(vehicleId)
                 .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
 
+        Booking booking = null;
+        if (request.bookingId() != null) {
+            booking = bookingRepo.findByIdAndDeletedFalseForUpdate(request.bookingId())
+                    .orElseThrow(() -> new ResourceNotFound("Prenotazione non trovata."));
+
+            if (!booking.getVehicle().getId().equals(vehicleId)) {
+                throw new BadRequest("La prenotazione non appartiene al veicolo selezionato.");
+            }
+
+            var existingIntervention = interventionHistoryRepo
+                    .findByBooking_IdAndDeletedFalse(booking.getId());
+            if (existingIntervention.isPresent()) {
+                InterventionHistory existing = existingIntervention.get();
+                if (existing.getStatus() != request.status()) {
+                    throw new BadRequest("Esiste già un intervento con uno stato diverso per questa prenotazione.");
+                }
+                if (booking.getStatus() != request.status()) {
+                    validateBookingTransition(booking, request.status());
+                    booking.setStatus(request.status());
+                }
+                return interventionHistoryMapper.toResponse(existing);
+            }
+
+            validateBookingTransition(booking, request.status());
+        }
+
         Long interventionKilometers = request.interventionKilometers();
         if (interventionKilometers < vehicle.getKilometers()) {
             throw new BadRequest("I chilometri inseriti (" + interventionKilometers + ") sono inferiori a quelli attuali del veicolo (" + vehicle.getKilometers() + ").");
@@ -61,19 +87,29 @@ public class InterventionHistoryService {
         interventionHistory.setJobs(jobs);
         if (request.bookingId() == null) {
             interventionHistory.setStatus(BookingStatus.COMPLETED);
-        }
-        vehicle.setKilometers(interventionKilometers);
-
-        if (request.bookingId() != null) {
-            Booking booking = bookingRepo.findById(request.bookingId())
-                    .orElseThrow(() -> new ResourceNotFound("Prenotazione non trovata."));
+        } else {
+            booking.setStatus(request.status());
             interventionHistory.setBooking(booking);
         }
+        vehicle.setKilometers(interventionKilometers);
 
         InterventionHistory savedIntervention = interventionHistoryRepo.save(interventionHistory);
         vehicleRepo.save(vehicle);
 
         return interventionHistoryMapper.toResponse(savedIntervention);
+    }
+
+    private void validateBookingTransition(Booking booking, BookingStatus targetStatus) {
+        boolean validTransition = targetStatus != null && switch (targetStatus) {
+            case REFUSED -> booking.getStatus() == BookingStatus.PENDING;
+            case COMPLETED -> booking.getStatus() == BookingStatus.IN_PROGRESS;
+            default -> false;
+        };
+
+        if (!validTransition) {
+            throw new BadRequest("La prenotazione non può passare da "
+                    + booking.getStatus() + " a " + targetStatus + " tramite la registrazione di un intervento.");
+        }
     }
 
     @Transactional
