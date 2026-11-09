@@ -23,6 +23,15 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpec
     @Query("select vehicle from Vehicle vehicle where vehicle.id = :id and vehicle.deleted = false")
     Optional<Vehicle> findByIdAndDeletedFalseForUpdate(@Param("id") Long id);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select vehicle from Vehicle vehicle
+            where vehicle.id = :vehicleId
+              and vehicle.user.id = :userId
+              and vehicle.deleted = false
+            """)
+    Optional<Vehicle> findByIdAndUserIdAndDeletedFalseForUpdate(@Param("vehicleId") Long vehicleId, @Param("userId") Long userId);
+
     boolean existsByPlateIgnoreCase(String plate);
 
     boolean existsByPlateIgnoreCaseAndDeletedFalse(String plate);

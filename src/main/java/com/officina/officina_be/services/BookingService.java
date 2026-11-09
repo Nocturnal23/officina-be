@@ -22,6 +22,8 @@ import com.officina.officina_be.entity.Booking;
 import com.officina.officina_be.entity.Jobs;
 import com.officina.officina_be.entity.User;
 import com.officina.officina_be.entity.Vehicle;
+import com.officina.officina_be.error.BadRequest;
+import com.officina.officina_be.error.DuplicateResource;
 import com.officina.officina_be.error.ResourceNotFound;
 import com.officina.officina_be.mapper.BookingMapper;
 import com.officina.officina_be.repository.BookingRepository;
@@ -44,10 +46,17 @@ public class BookingService {
 
     @Transactional
     public BookingResponse saveBooking(BookingRequest request, Long vehicleId, Long userId) {
-        Vehicle vehicle = vehicleRepo.findByIdAndUser_IdAndDeletedFalse(vehicleId, userId)
-                .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
         User user = userRepo.findByIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new ResourceNotFound("Utente non trovato."));
+
+        Vehicle vehicle = vehicleRepo.findByIdAndUserIdAndDeletedFalseForUpdate(vehicleId, userId)
+                .orElseThrow(() -> new ResourceNotFound("Veicolo non trovato."));
+
+        if (bookingRepo.existsByVehicle_IdAndDeletedFalseAndStatusIn(
+                vehicleId,
+                List.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS))) {
+            throw new DuplicateResource("Il veicolo ha già una prenotazione attiva.");
+        }
 
         Set<Jobs> jobs = new HashSet<>(
                 jobsRepo.findByIdInAndDeletedFalse(request.jobsIds()));

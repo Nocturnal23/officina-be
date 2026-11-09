@@ -91,6 +91,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
             @Param("query") String query,
             Pageable pageable);
 
+    boolean existsByVehicle_IdAndDeletedFalseAndStatusIn(
+            Long vehicleId,
+            List<BookingStatus> statuses);
+
     /*
      * PROJECTION (Proiezione basata su Interfaccia)
      * 
