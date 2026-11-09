@@ -15,6 +15,9 @@ public record InterventionHistoryRequest(
     @Size(max = 500, message = "Il messaggio non può eccedere i 500 caratteri!")
     String notes,
 
+    @Size(max = 500, message = "Le note del cliente non possono eccedere i 500 caratteri!")
+    String customerNotes,
+
     LocalDate completedAt,
 
     @NotNull(message = "Devi inserire il chilometraggio attuale")

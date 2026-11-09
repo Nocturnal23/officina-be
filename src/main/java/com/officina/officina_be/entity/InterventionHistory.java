@@ -50,6 +50,9 @@ public class InterventionHistory extends BaseEntity {
     @Column(name = "notes", nullable = true)
     private String notes;
 
+    @Column(name = "customer_notes", nullable = true, length = 500)
+    private String customerNotes;
+
     @CreationTimestamp
     @Column(name = "completed_at", nullable = false)
     private LocalDate completedAt;

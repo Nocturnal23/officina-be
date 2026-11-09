@@ -19,6 +19,7 @@ public class InterventionHistoryMapper {
         InterventionHistory interventionHistory = new InterventionHistory();
         interventionHistory.setCost(request.cost());
         interventionHistory.setNotes(request.notes());
+        interventionHistory.setCustomerNotes(request.customerNotes());
         interventionHistory.setCompletedAt(request.completedAt());
         interventionHistory.setInterventionKilometers(request.interventionKilometers());
         interventionHistory.setStatus(request.status());
@@ -34,11 +35,16 @@ public class InterventionHistoryMapper {
 
         Double safeCost = entity.getCost() != null ? entity.getCost() : 0;
         Long safeBookingId = entity.getBooking() != null ? entity.getBooking().getId() : null;
+        String customerNotes = entity.getCustomerNotes();
+        if (customerNotes == null && entity.getBooking() != null) {
+            customerNotes = entity.getBooking().getNotes();
+        }
 
         return new InterventionHistoryResponse(
             entity.getId(),
             safeCost,
             entity.getNotes(),
+            customerNotes,
             entity.getCompletedAt(),
             entity.getInterventionKilometers(),
             entity.getVehicle().getId(),

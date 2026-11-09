@@ -9,6 +9,7 @@ public record InterventionHistoryResponse(
     Long id,
     Double cost,
     String notes,
+    String customerNotes,
     LocalDate completedAt,
     Long interventionKilometers,
     Long vehicleId,

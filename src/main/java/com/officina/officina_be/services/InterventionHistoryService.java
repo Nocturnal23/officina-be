@@ -90,6 +90,7 @@ public class InterventionHistoryService {
         } else {
             booking.setStatus(request.status());
             interventionHistory.setBooking(booking);
+            interventionHistory.setCustomerNotes(booking.getNotes());
         }
         vehicle.setKilometers(interventionKilometers);
 
